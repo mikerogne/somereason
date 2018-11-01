@@ -19,39 +19,42 @@ const client = new irc.Client(server, botOptions.nickname, botOptions);
 //     args: ['#test', 'test message'] // arguments to the command
 // }
 
+/**
+ * @param {string} from
+ * @param {string} to
+ * @param {string} text
+ * @param {object} message
+ */
+const logToConsole = (from, to, text, message) => {
+    const d = new Date;
+    to = to === client.nick ? 'PRIVMSG' : to;
+
+    console.log(`[${d.toLocaleString()}] ${to} <${from}> ${text}`);
+    // console.log(`MESSAGE: ${JSON.stringify(message, null, 2)}`);
+};
+
 client.addListener('error', msg => {
-    console.error('error: ', JSON.stringify(msg, null, 2));
+    const d = new Date;
+    console.error(`[${d.toLocaleString()}] ERROR: ${JSON.stringify(msg, null, 2)}`);
 });
 
 client.addListener('registered', message => {
-    console.log(`Connected to ${server}`);
+    const d = new Date;
+    console.error(`[${d.toLocaleString()}] Connected to ${server}`);
 });
 
-client.addListener('message', (nick, to, text, message) => {
-    // {
-    //     "nick": "mrogne",
-    //     "to": "#laravel-offtopic",
-    //     "text": ".",
-    //     "message": {
-    //     "prefix": "mrogne!~mrogne@unaffiliated/judgypants",
-    //         "nick": "mrogne",
-    //         "user": "~mrogne",
-    //         "host": "unaffiliated/judgypants",
-    //         "command": "PRIVMSG",
-    //         "rawCommand": "PRIVMSG",
-    //         "commandType": "normal",
-    //         "args": [
-    //         "#laravel-offtopic",
-    //         "."
-    //     ]
-    //   }
-    // }
-    // console.log(JSON.stringify({
-    //     nick,
-    //     to,
-    //     text,
-    //     message
-    // }, null, 2))
-    const d = new Date;
-    console.log(`[${d.toLocaleString()}] ${to} <${nick}> ${text}`);
+client.addListener('message#', (from, to, text, message) => {
+    logToConsole(from, to, text, message);
+});
+
+client.addListener('action', (from, to, text, message) => {
+    logToConsole(from, `${to} (ACTION)`, text, message);
+});
+
+client.addListener('pm', (from, text, message) => {
+    logToConsole(from, 'PRIVMSG', text, message);
+});
+
+client.addListener('notice', (from, to, text, message) => {
+    logToConsole(from, 'NOTICE', text, message);
 });
