@@ -23,3 +23,10 @@ client.addListener('registered', message => {
 client.addListener('message', logIncomingMessage);
 client.addListener('action', logIncomingMessage);
 client.addListener('notice', logIncomingMessage);
+
+// TODO: Create a 'plugins' setup & turn this into a plugin.
+client.addListener('message#', (from, to, text, message) => {
+    if (text === '<3' && Math.random() >= 0.5) {
+        client.say(to, '<3');
+    }
+});
