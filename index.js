@@ -26,11 +26,26 @@ const client = new irc.Client(server, botOptions.nickname, botOptions);
  * @param {object} message
  */
 const logToConsole = (from, to, text, message) => {
-    const d = new Date;
     to = to === client.nick ? 'PRIVMSG' : to;
+    const d = new Date;
 
-    console.log(`[${d.toLocaleString()}] ${to} <${from}> ${text}`);
-    // console.log(`MESSAGE: ${JSON.stringify(message, null, 2)}`);
+    const messageParts = [
+        `[${d.toLocaleString()}]`,
+        to,
+        getContextFromMessage(message),
+        `<${from}>`,
+        text
+    ].filter(p => p !== null);
+
+    console.log(messageParts.join(' '));
+};
+
+const getContextFromMessage = (message) => {
+    if (message.args.length >= 2 && message.args[1].startsWith('\u0001ACTION ')) {
+        return '(ACTION)';
+    }
+
+    return null;
 };
 
 client.addListener('error', msg => {
@@ -48,7 +63,7 @@ client.addListener('message#', (from, to, text, message) => {
 });
 
 client.addListener('action', (from, to, text, message) => {
-    logToConsole(from, `${to} (ACTION)`, text, message);
+    logToConsole(from, to, text, message);
 });
 
 client.addListener('pm', (from, text, message) => {
