@@ -1,51 +1,13 @@
 const irc = require('irc-upd');
-const fs = require('fs');
+const messages = require('./lib/messages');
 
 const botOptions = Object.assign({}, require('./config/client.json'));
 const server = botOptions.server || 'chat.freenode.net';
 
 const client = new irc.Client(server, botOptions.nickname, botOptions);
 
-// message = {
-//     prefix: "user!~realname@example.host", // the prefix for the message (optional, user prefix here)
-//     prefix: "irc.example.com", // the prefix for the message (optional, server prefix here)
-//     nick: "user", // the nickname portion of the prefix (if the prefix is a user prefix)
-//     user: "~realname", // the username portion of the prefix (if the prefix is a user prefix)
-//     host: "example.host", // the hostname portion of the prefix (if the prefix is a user prefix)
-//     server: "irc.example.com", // the server address (if the prefix was a server prefix)
-//     rawCommand: "PRIVMSG", // the command exactly as sent from the server
-//     command: "PRIVMSG", // human-readable version of the command (if it was previously, say, numeric)
-//     commandType: "normal", // normal, error, or reply
-//     args: ['#test', 'test message'] // arguments to the command
-// }
-
-/**
- * @param {string} from
- * @param {string} to
- * @param {string} text
- * @param {object} message
- */
-const logToConsole = (from, to, text, message) => {
-    to = to === client.nick ? 'PRIVMSG' : to;
-    const d = new Date;
-
-    const messageParts = [
-        `[${d.toLocaleString()}]`,
-        to,
-        getContextFromMessage(message),
-        `<${from}>`,
-        text
-    ].filter(p => p !== null);
-
-    console.log(messageParts.join(' '));
-};
-
-const getContextFromMessage = (message) => {
-    if (message.args.length >= 2 && message.args[1].startsWith('\u0001ACTION ')) {
-        return '(ACTION)';
-    }
-
-    return null;
+const logIncomingMessage = (from, to, text, message) => {
+    console.log(messages.getFormattedLogOutput(message, client.nick));
 };
 
 client.addListener('error', msg => {
@@ -58,18 +20,6 @@ client.addListener('registered', message => {
     console.error(`[${d.toLocaleString()}] Connected to ${server}`);
 });
 
-client.addListener('message#', (from, to, text, message) => {
-    logToConsole(from, to, text, message);
-});
-
-client.addListener('action', (from, to, text, message) => {
-    logToConsole(from, to, text, message);
-});
-
-client.addListener('pm', (from, text, message) => {
-    logToConsole(from, 'PRIVMSG', text, message);
-});
-
-client.addListener('notice', (from, to, text, message) => {
-    logToConsole(from, 'NOTICE', text, message);
-});
+client.addListener('message', logIncomingMessage);
+client.addListener('action', logIncomingMessage);
+client.addListener('notice', logIncomingMessage);
