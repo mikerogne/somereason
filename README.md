@@ -13,7 +13,7 @@ Just another IRC bot. All the cool kids are doing it! 👈👈😎
 - `git clone git@github.com:mikerogne/somereason.git`
 - `npm install`
 - `cp config/example-client.json config/client.json` (this is where you set the config options)
-- `npm start`
+- `npm start` (If you want giphy support, you must specify your API key: `GIPHY_API_KEY=key npm start`)
 
 ## Running the tests
 
@@ -29,4 +29,5 @@ This project is licensed under the [ISC License](https://opensource.org/licenses
 
 ## Acknowledgments
 
-* https://github.com/Throne3d/node-irc/
+- https://github.com/Throne3d/node-irc/
+- https://github.com/austinkelleher/giphy-api

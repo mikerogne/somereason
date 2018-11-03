@@ -6,7 +6,7 @@ const messages = require('../lib/messages');
  * Simply listens for messages and logs them to the console.
  * (Also serves as a good example of basic plugin structure!)
  */
-class ConsoleLogger {
+class ConsoleLoggerPlugin {
     constructor() {
         this.client = null;
     }
@@ -41,4 +41,4 @@ class ConsoleLogger {
     }
 }
 
-module.exports = new ConsoleLogger();
+module.exports = new ConsoleLoggerPlugin();

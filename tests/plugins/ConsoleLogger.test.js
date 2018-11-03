@@ -7,7 +7,7 @@ it('Should log messages to console', () => {
     const client = new events.EventEmitter();
     client.nick = 'somereason';
 
-    const consoleLoggerPlugin = require('../../plugins/ConsoleLogger');
+    const consoleLoggerPlugin = require('../../plugins/ConsoleLogger.plugin');
 
     // ACT
     const pluginLoaded = consoleLoggerPlugin.load(client);

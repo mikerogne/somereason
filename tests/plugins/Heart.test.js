@@ -7,7 +7,7 @@ it('Should give a <3 back', () => {
     client.nick = 'somereason';
     client.say = jest.fn();
 
-    const heartPlugin = require('../../plugins/Heart.js');
+    const heartPlugin = require('../../plugins/Heart.plugin.js');
 
     // ACT
     const pluginLoaded = heartPlugin.load(client);

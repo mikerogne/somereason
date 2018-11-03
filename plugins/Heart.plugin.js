@@ -1,4 +1,4 @@
-class Heart {
+class HeartPlugin {
     constructor() {
         this.client = null;
     }
@@ -24,4 +24,4 @@ class Heart {
     }
 }
 
-module.exports = new Heart;
+module.exports = new HeartPlugin;
