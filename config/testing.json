@@ -1,0 +1,39 @@
+{
+    "nickname": "somereason",
+    "realName": "somereason",
+    "userName": "",
+    "password": "",
+    "server": "chat.freenode.net",
+    "port": 6667,
+    "localAddress": null,
+    "debug": false,
+    "showErrors": false,
+    "channels": [
+        "#laravel-offtopic"
+    ],
+    "autoConnect": false,
+    "autoRejoin": true,
+    "autoRenick": true,
+    "renickCount": null,
+    "renickDelay": 60000,
+    "retryCount": null,
+    "retryDelay": 2000,
+    "secure": false,
+    "selfSigned": false,
+    "certExpired": false,
+    "floodProtection": false,
+    "floodProtectionDelay": 1000,
+    "sasl": true,
+    "webirc": {
+        "pass": "",
+        "ip": "",
+        "host": ""
+    },
+    "stripColors": false,
+    "channelPrefixes": "&#",
+    "messageSplit": 512,
+    "encoding": null,
+    "millisecondsOfSilenceBeforePingSent": 15000,
+    "millisecondsBeforePingTimeout": 8000,
+    "enableStrictParse": false
+}
