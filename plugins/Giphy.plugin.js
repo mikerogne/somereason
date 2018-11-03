@@ -5,11 +5,10 @@
  * Example: GIPHY_API_KEY="api-key-here" node index.js
  */
 
-const giphyPlugin = require('./Giphy.instance');
-
 class Giphy {
     constructor() {
         this.client = null;
+        this.giphyPlugin = require('giphy-api')(process.env.GIPHY_API_KEY);
     }
 
     load(client) {
@@ -22,7 +21,7 @@ class Giphy {
         client.addListener('message', (from, channel, text, message) => {
             if (text.startsWith('.giphy ') && text.length > 7) {
                 const query = text.replace('.giphy ', '');
-                giphyPlugin.search({
+                this.giphyPlugin.search({
                     q: query,
                     rating: 'pg-13',
                     limit: 1,
