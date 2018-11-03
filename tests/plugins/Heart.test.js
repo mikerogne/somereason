@@ -15,10 +15,12 @@ it('Should give a <3 back', () => {
     client.emit('message#', 'otherperson', '#heart', 'somereason: <3', {});
     client.emit('message#', 'otherperson', '#heart', 'somereason <3', {});
     client.emit('message#', 'otherperson', '#heart', 'somereason:<3', {});
+    client.emit('message#', 'otherperson', '#heart', 'somereason,<3', {});
+    client.emit('message#', 'otherperson', '#heart', 'somereason, <3', {});
     client.emit('message#', 'otherperson', '#heart', '<3', {}); // Should not invoke response.
     client.emit('message#', 'otherperson', '#heart', 'somereason<3', {}); // Should not invoke response.
 
     // ASSERT
     expect(pluginLoaded).toBe(true); // Plugin should be loaded.
-    expect(client.say.mock.calls.length).toBe(3); // Bot should have responded 3 times.
+    expect(client.say.mock.calls.length).toBe(5); // Bot should have responded 3 times.
 });

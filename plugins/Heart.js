@@ -11,6 +11,8 @@ class Heart {
                 `${client.nick}: <3`,
                 `${client.nick}:<3`,
                 `${client.nick} <3`,
+                `${client.nick}, <3`,
+                `${client.nick},<3`,
             ];
 
             if (lovelyMessages.includes(text.trim())) {
