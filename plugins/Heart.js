@@ -7,9 +7,9 @@ class Heart {
         this.client = client;
 
         client.addListener('message#', (from, channel, text, message) => {
-            console.log({from, channel, text, message});
             const lovelyMessages = [
                 `${client.nick}: <3`,
+                `${client.nick}:<3`,
                 `${client.nick} <3`,
             ];
 

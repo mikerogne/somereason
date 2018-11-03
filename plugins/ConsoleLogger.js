@@ -26,7 +26,7 @@ class ConsoleLogger {
 
         this.client.addListener('registered', message => {
             const d = new Date;
-            console.error(`[${d.toLocaleString()}] Connected to ${server}`);
+            console.log(`[${d.toLocaleString()}] Connected to ${server}`);
         });
 
         this.client.addListener('message', (from, to, text, message) => this.logIncomingMessage(from, to, text, message));
@@ -36,7 +36,7 @@ class ConsoleLogger {
         return true;
     }
 
-    logIncomingMessage(from, to, text, message) {
+    logIncomingMessage(from, to, text, message = text) {
         console.log(messages.getFormattedLogOutput(message, this.client.nick));
     }
 }
