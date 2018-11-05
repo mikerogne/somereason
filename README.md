@@ -7,6 +7,8 @@ Just another IRC bot. All the cool kids are doing it! 👈👈😎
 ### Prerequisites
 
 - Node.js (I like using `nvm` personally. See more: [Node Version Manager](https://github.com/creationix/nvm))
+- If you want to use the Giphy plugin, you must [register for API key](https://developers.giphy.com/docs/#api-keys)
+- If you want to use the Youtube plugin, you must [register for API key](https://developers.google.com/youtube/registering_an_application)
 
 ### Steps
 

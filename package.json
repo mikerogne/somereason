@@ -11,7 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "giphy-api": "^2.0.0",
-    "irc-upd": "^0.10.0"
+    "irc-upd": "^0.10.0",
+    "youtube-search": "^1.1.3"
   },
   "devDependencies": {
     "jest": "^23.6.0"
