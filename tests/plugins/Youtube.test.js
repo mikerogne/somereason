@@ -11,6 +11,7 @@ it('gives youtube link', done => {
         callback(null, [{
             id: '31g0YE61PLQ',
             link: 'https://www.youtube.com/watch?v=31g0YE61PLQ',
+            title: 'Video Title Here',
         }]);
     });
 
@@ -26,7 +27,7 @@ it('gives youtube link', done => {
     expect(pluginLoaded).toBe(true);
     expect(client.say.mock.calls.length).toBe(1); // Bot should have responded.
     expect(client.say.mock.calls[0][0]).toBe('#some-channel');
-    expect(client.say.mock.calls[0][1]).toBe('https://www.youtube.com/watch?v=31g0YE61PLQ');
+    expect(client.say.mock.calls[0][1]).toBe('https://www.youtube.com/watch?v=31g0YE61PLQ - Video Title Here');
 
     done();
 });

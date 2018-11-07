@@ -34,7 +34,7 @@ class Youtube {
                         return false;
                     }
 
-                    client.say(destination, results[0].link);
+                    client.say(destination, `${results[0].link} - ${results[0].title}`);
                 });
             }
         });
