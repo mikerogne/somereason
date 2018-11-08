@@ -37,6 +37,7 @@ class ConsoleLoggerPlugin {
     }
 
     logIncomingMessage(from, to, text, message = text) {
+        // console.log({ from, to, text, message });
         console.log(messages.getFormattedLogOutput(message, this.client.nick));
     }
 }

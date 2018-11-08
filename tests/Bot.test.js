@@ -32,8 +32,7 @@ describe('Bot instantiation', () => {
         expect(bot).toBeInstanceOf(Bot);
         expect(JSON.stringify(bot.botOptions)).toBe(expectedJson);
 
-        expect(bot.loadedPlugins).toHaveLength(totalPlugins);
-
+        expect(bot.loadedPlugins.length).toBe(totalPlugins);
         done();
     });
 });

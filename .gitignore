@@ -1,3 +1,5 @@
 config/client.json
+config/authorized_users.json
+config/channels.json
 node_modules
 start.sh
