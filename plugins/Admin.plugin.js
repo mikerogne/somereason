@@ -53,7 +53,7 @@ class Admin {
             return [];
         }
 
-        return require(pathToAuthorizedUsers);
+        return JSON.parse(fs.readFileSync(pathToAuthorizedUsers, 'utf8'));
     }
 
     addUser(user) {
