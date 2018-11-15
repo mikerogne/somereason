@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const configPath = path.resolve(__dirname, '../config');
+const configPath = path.join(__dirname, '../config');
 const pathToAuthorizedUsers = path.join(configPath, 'authorized_users.json');
 
 /**
@@ -11,14 +11,16 @@ const pathToAuthorizedUsers = path.join(configPath, 'authorized_users.json');
 
 class Admin {
     constructor() {
+        this.configService = null;
         this.client = null;
         this.authorizedUsers = [];
     }
 
-    load(client) {
+    load(client, configService) {
         this.client = client;
+        this.configService = configService;
         this.authorizedUsers = this.loadAuthorizedUsers();
-        
+
         this.client.addListener('message', (from, to, text, message) => {
             if (text.startsWith(`${client.nick}: trust `) && this.isAuthorized(message.prefix)) {
                 return this.addUser(text.replace(`${client.nick}: trust `, ''));
@@ -68,10 +70,22 @@ class Admin {
 
     joinChannel(channel) {
         this.client.join(channel);
+
+        const config = this.configService.getConfig();
+        config.channels.push(channel);
+
+        this.configService.updateConfig(config);
     }
 
     partChannel(channel) {
         this.client.part(channel);
+
+        const config = this.configService.getConfig();
+
+        if (config.channels.includes(channel)) {
+            config.channels = config.channels.filter(c => c !== channel);
+            this.configService.updateConfig(config);
+        }
     }
 }
 

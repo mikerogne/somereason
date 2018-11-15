@@ -1,4 +1,7 @@
 const events = require('events');
+const fs = require('fs');
+const path = require('path');
+const Config = require('../../lib/Config');
 
 const admins = [
     'realadmin!~ident@unaffiliated/org',
@@ -20,7 +23,12 @@ beforeEach(() => {
 
     const bot = new events.EventEmitter();
     bot.nick = 'somereason';
-    adminPlugin.load(bot);
+
+    const pathToRealConfig = path.join(__dirname, '../../config/client.json');
+    const pathToTestConfig = path.join(__dirname, '../../config/jest-client.json');
+
+    fs.copyFileSync(pathToRealConfig, pathToTestConfig);
+    adminPlugin.load(bot, new Config(pathToTestConfig));
 });
 
 describe('Authorization', () => {
@@ -119,6 +127,8 @@ describe('IRC Commands', () => {
         // ASSERT
         expect(adminPlugin.client.join.mock.calls.length).toBe(1);
         expect(adminPlugin.client.join.mock.calls[0][0]).toBe('#newchannel');
+
+        expect(adminPlugin.configService.getConfig().channels).toContain('#newchannel');
     });
 
     it('Parts channel when admin requests it', () => {
@@ -134,6 +144,7 @@ describe('IRC Commands', () => {
         // ASSERT
         expect(adminPlugin.client.part.mock.calls.length).toBe(1);
         expect(adminPlugin.client.part.mock.calls[0][0]).toBe('#newchannel');
+        expect(adminPlugin.configService.getConfig().channels).not.toContain('#newchannel');
     });
 
     it('Does not join channel when non-admin requests it', () => {
