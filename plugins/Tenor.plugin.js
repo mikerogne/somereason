@@ -25,7 +25,6 @@ class Tenor {
 
                 this.tenorSearch(query, process.env.TENOR_API_KEY)
                     .then(url => {
-
                         client.say(destination, url);
                     })
                     .catch(err => {
