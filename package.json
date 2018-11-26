@@ -11,6 +11,7 @@
   "author": "Mike Rogne <mikerogne@users.noreply.github.com> (https://github.com/mikerogne)",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "giphy-api": "^2.0.0",
     "irc-upd": "^0.10.0",
     "youtube-search": "^1.1.3"
