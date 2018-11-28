@@ -7,15 +7,22 @@ Just another IRC bot. All the cool kids are doing it! 👈👈😎
 ### Prerequisites
 
 - Node.js (I like using `nvm` personally. See more: [Node Version Manager](https://github.com/creationix/nvm))
-- If you want to use the Giphy plugin, you must [register for API key](https://developers.giphy.com/docs/#api-keys)
-- If you want to use the Youtube plugin, you must [register for API key](https://developers.google.com/youtube/registering_an_application)
+- Common sense
 
-### Steps
+### Plugins Requiring API Key
+
+- **GIPHY**: [Register for API key](https://developers.giphy.com/docs/#api-keys)
+- **TENOR**: [Register for API key](https://tenor.com/gifapi/documentation)
+- **YOUTUBE**: [Register for API key](https://developers.google.com/youtube/registering_an_application)
+- **DOCS**: App ID & API key required -- but you have to find this on your own :).
+
+### Getting Up & Running
 
 - `git clone git@github.com:mikerogne/somereason.git`
 - `npm install`
 - `cp config/example-client.json config/client.json` (this is where you set the config options)
-- `npm start` (If you want giphy support, you must specify your API key: `GIPHY_API_KEY=key npm start`)
+- `cp config/example-env.json config/env.json` (this is where you set the config options)
+- `npm start` (Make sure to set the appropriate values in config/env.json - depending on which plugins you want to use!)
 
 ## Running the tests
 
@@ -32,4 +39,4 @@ This project is licensed under the [ISC License](https://opensource.org/licenses
 ## Acknowledgments
 
 - https://github.com/Throne3d/node-irc/
-- https://github.com/austinkelleher/giphy-api
+
