@@ -41,7 +41,7 @@ class Docs {
                 this.algoliaIndex = this.algoliaClient.initIndex('docs');
             }
 
-            const branch = this.env('ALGOLIA_DOCS_BRANCH') || 'master';
+            const branch = this.env.ALGOLIA_DOCS_BRANCH || 'master';
             const search = this.algoliaIndex.search(query, { tagFilters: branch })
                                .then(result => {
                                    if (result.hits.length > 0) {
