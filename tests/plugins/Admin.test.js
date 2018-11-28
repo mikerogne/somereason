@@ -3,6 +3,11 @@ const path = require('path');
 const fs = require('fs');
 const Config = require('../../lib/Config');
 
+const originalAuthorizedUsers = fs.readFileSync(path.join(__dirname, '../../config/authorized_users.json'));
+afterEach(() => {
+    fs.writeFileSync(path.join(__dirname, '../../config/authorized_users.json'), originalAuthorizedUsers);
+});
+
 const admins = [
     'realadmin!~ident@unaffiliated/org',
     'realadmin2!~ident@unaffiliated/org',

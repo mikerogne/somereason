@@ -21,7 +21,7 @@ class Admin {
         this.client = client;
         this.configService = configService;
         this.authorizedUsers = this.loadAuthorizedUsers();
-        this.ignoredUsers = this.loadIgnoredUsers();
+        this.ignoredUsers = JSON.parse(fs.readFileSync(configService.pathToIgnoredUsers, 'utf8'));
 
         this.client.addListener('message', (from, to, text, message) => {
             if (text.startsWith(`${client.nick}: trust `) && this.isAuthorized(message.prefix)) {
@@ -41,25 +41,20 @@ class Admin {
             }
 
             if (text.startsWith(`.ignore `) && this.isAuthorized(message.prefix)) {
-                return this.ignoreUser(text.replace(`.ignore `, ''));
+                return this.ignoreUser(text.replace(`.ignore `, '').trim());
             }
 
             if (text.startsWith(`.unignore `) && this.isAuthorized(message.prefix)) {
-                return this.unignoreUser(text.replace(`.unignore `, ''));
+                return this.unignoreUser(text.replace(`.unignore `, '').trim());
             }
         });
 
         return true;
     }
 
-    loadIgnoredUsers() {
-        this.ignoredUsers = require('../config/ignored_users.json');
-    }
-
     ignoreUser(user) {
         this.client.whois(user, whois => {
             // If the user exists, we'll have all data. Otherwise, we will only have 'nick'.
-
             if (!whois.host) {
                 return false;
             }
@@ -93,7 +88,8 @@ class Admin {
     _addToIgnoreList(ignored) {
         this.ignoredUsers.push(ignored);
 
-        fs.writeFileSync(path.join(__dirname, '../config/ignored_users.json'), JSON.stringify(this.ignoredUsers));
+        fs.writeFileSync(path.join(this.configService.pathToIgnoredUsers), JSON.stringify(this.ignoredUsers));
+        this.configService.reloadIgnoredUsers();
     }
 
     _removeFromIgnoreList(ignored) {
@@ -101,7 +97,8 @@ class Admin {
             u => JSON.stringify(u) !== JSON.stringify(ignored)
         );
 
-        fs.writeFileSync(path.join(__dirname, '../config/ignored_users.json'), JSON.stringify(this.ignoredUsers));
+        fs.writeFileSync(path.join(this.configService.pathToIgnoredUsers), JSON.stringify(this.ignoredUsers));
+        this.configService.reloadIgnoredUsers();
     }
 
     isAuthorized(user) {
