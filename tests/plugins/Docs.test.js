@@ -81,5 +81,23 @@ it('says no results found', done => {
 });
 
 it('does not search without search phrase', done => {
-    done();
+    // ARRANGE
+    const bot = new events.EventEmitter();
+    bot.nick = 'somereason';
+    bot.say = jest.fn();
+
+    const pluginInstance = require('../../plugins/Docs.plugin.js');
+
+    pluginInstance.search = jest.fn();
+
+    // ACT
+    const pluginLoaded = pluginInstance.load(bot, configService, env);
+    bot.emit('message', 'otherperson', '#docs', '.docs ');
+
+    // ASSERT
+    process.nextTick(() => {
+        expect(pluginLoaded).toBe(true);
+        expect(bot.say.mock.calls.length).toBe(0); // Bot should NOT have responded.
+        done();
+    });
 });
