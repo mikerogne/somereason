@@ -1,0 +1,9 @@
+{
+  "NODE_ENV": "",
+  "ALGOLIA_APP_ID": "",
+  "ALGOLIA_API_KEY": "",
+  "ALGOLIA_DOCS_BRANCH": "master",
+  "GIPHY_API_KEY": "",
+  "TENOR_API_KEY": "",
+  "YT_API_KEY": ""
+}

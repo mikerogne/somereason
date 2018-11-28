@@ -2,5 +2,6 @@ config/client.json
 config/jest-client.json
 config/authorized_users.json
 config/channels.json
+config/env.json
 node_modules
 start.sh
