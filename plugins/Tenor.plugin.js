@@ -1,9 +1,3 @@
-/**
- * Usage: An API key is required, and this shouldn't be in version control obviously.
- * So we'll just use (for now) an environment variable to pass this into node.
- *
- * Example: TENOR_API_KEY="api-key-here" node index.js
- */
 const axios = require('axios');
 
 class Tenor {
@@ -11,10 +5,10 @@ class Tenor {
         this.client = null;
     }
 
-    load(client) {
+    load(client, configService, env) {
         this.client = client;
 
-        if (!process.env.TENOR_API_KEY) {
+        if (!env.TENOR_API_KEY) {
             return false;
         }
 
@@ -23,7 +17,7 @@ class Tenor {
                 const query = text.replace('.tenor ', '');
                 const destination = channel === this.client.nick ? from : channel;
 
-                this.tenorSearch(query, process.env.TENOR_API_KEY)
+                this.tenorSearch(query, env.TENOR_API_KEY)
                     .then(url => {
                         client.say(destination, url);
                     })

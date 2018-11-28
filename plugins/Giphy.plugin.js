@@ -1,22 +1,17 @@
-/**
- * Usage: An API key is required, and this shouldn't be in version control obviously.
- * So we'll just use (for now) an environment variable to pass this into node.
- *
- * Example: GIPHY_API_KEY="api-key-here" node index.js
- */
-
 class Giphy {
     constructor() {
         this.client = null;
-        this.giphyPlugin = require('giphy-api')(process.env.GIPHY_API_KEY);
+        this.giphyPlugin = null;
     }
 
-    load(client) {
+    load(client, configService, env) {
         this.client = client;
 
-        if (!process.env.GIPHY_API_KEY) {
+        if (!env.GIPHY_API_KEY) {
             return false;
         }
+
+        this.giphyPlugin = require('giphy-api')(env.GIPHY_API_KEY);
 
         client.addListener('message', (from, channel, text, message) => {
             if (text.startsWith('.giphy ') && text.length > 7) {

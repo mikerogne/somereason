@@ -1,10 +1,17 @@
 const events = require('events');
-
-process.env.GIPHY_API_KEY = 'fake-api-key';
+const configService = null;
+const env = require('../../config/jest-env.json');
 
 it('gives giphy link', done => {
     // ARRANGE
     const pluginInstance = require('../../plugins/Giphy.plugin.js');
+
+    const client = new events.EventEmitter();
+    client.nick = 'somereason';
+    client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
+
+    // ACT
+    const pluginLoaded = pluginInstance.load(client, configService, env);
 
     // Mock for giphy lookup. Don't want to hit API.
     pluginInstance.giphyPlugin.search = jest.fn((searchOptions, callback) => {
@@ -14,12 +21,6 @@ it('gives giphy link', done => {
         });
     });
 
-    const client = new events.EventEmitter();
-    client.nick = 'somereason';
-    client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
-
-    // ACT
-    const pluginLoaded = pluginInstance.load(client);
     client.emit('message', 'otherperson', '#giphy', '.giphy the office');
 
     // ASSERT
@@ -35,6 +36,13 @@ it('says no results found', done => {
     // ARRANGE
     const pluginInstance = require('../../plugins/Giphy.plugin.js');
 
+    const client = new events.EventEmitter();
+    client.nick = 'somereason';
+    client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
+
+    // ACT
+    const pluginLoaded = pluginInstance.load(client, configService, env);
+
     // Mock for giphy lookup. Don't want to hit API.
     pluginInstance.giphyPlugin.search = jest.fn((searchOptions, callback) => {
         callback(null, {
@@ -42,12 +50,6 @@ it('says no results found', done => {
         });
     });
 
-    const client = new events.EventEmitter();
-    client.nick = 'somereason';
-    client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
-
-    // ACT
-    const pluginLoaded = pluginInstance.load(client);
     client.emit('message', 'otherperson', '#giphy', '.giphy the office');
 
     // ASSERT
@@ -68,7 +70,7 @@ it('does not search giphy without search phrase', () => {
     client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
 
     // ACT
-    const pluginLoaded = giphyPlugin.load(client);
+    const pluginLoaded = giphyPlugin.load(client, configService, env);
 
     client.emit('message#', 'otherperson', '#giphy', '.giphy ');
 

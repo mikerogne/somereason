@@ -3,7 +3,7 @@ class HeartPlugin {
         this.client = null;
     }
 
-    load(client) {
+    load(client, configService, env) {
         this.client = client;
 
         client.addListener('message#', (from, channel, text, message) => {

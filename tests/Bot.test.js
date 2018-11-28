@@ -3,10 +3,6 @@ const fs = require('fs');
 const Bot = require('../lib/Bot');
 const pathToConfig = path.resolve(__dirname, '../config/testing.json');
 
-process.env.GIPHY_API_KEY = 'fake-api-key';
-process.env.YT_API_KEY = 'fake-api-key';
-process.env.TENOR_API_KEY = 'fake-api-key';
-
 describe('Bot instantiation', () => {
     it('can create new bot instance', done => {
         // ARRANGE

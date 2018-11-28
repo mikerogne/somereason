@@ -16,7 +16,7 @@ class Admin {
         this.authorizedUsers = [];
     }
 
-    load(client, configService) {
+    load(client, configService, env) {
         this.client = client;
         this.configService = configService;
         this.authorizedUsers = this.loadAuthorizedUsers();

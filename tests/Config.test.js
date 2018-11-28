@@ -9,6 +9,10 @@ beforeEach(() => {
     fs.copyFileSync(pathToRealConfig, pathToTestConfig);
 });
 
+afterEach(() => {
+    fs.copyFileSync(pathToRealConfig, pathToTestConfig);
+});
+
 it('Can read config', () => {
     // ARRANGE
     const configService = new Config(pathToTestConfig);
@@ -33,4 +37,19 @@ it('Can write config', () => {
 
     // ASSERT
     expect(configService.getConfig().channels).toContain('#mike-was-here');
+});
+
+it('Can read env variables', done => {
+    // ARRANGE
+    const configService = new Config(pathToTestConfig);
+    const realEnv = JSON.parse(fs.readFileSync(path.join(__dirname, '../config/env.json'), 'utf8'));
+    const totalValues = Object.entries(realEnv).length;
+
+    // ACT
+    const env = configService.env();
+
+    // ASSERT
+    expect(Object.entries(env).length).toBe(totalValues);
+    expect(Object.entries(env).length).toBeGreaterThan(0);
+    done();
 });

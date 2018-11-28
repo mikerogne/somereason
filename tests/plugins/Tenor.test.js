@@ -1,6 +1,6 @@
 const events = require('events');
-
-process.env.TENOR_API_KEY = 'fake-api-key';
+const configService = null;
+const env = require('../../config/jest-env.json');
 
 it('gives tenor link', done => {
     // ARRANGE
@@ -14,7 +14,7 @@ it('gives tenor link', done => {
     bot.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
 
     // ACT
-    const pluginLoaded = pluginInstance.load(bot);
+    const pluginLoaded = pluginInstance.load(bot, configService, env);
     bot.emit('message', 'otherperson', '#tenor', '.tenor the office');
 
     // ASSERT
@@ -40,7 +40,7 @@ it('says no results found', done => {
     bot.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
 
     // ACT
-    const pluginLoaded = pluginInstance.load(bot);
+    const pluginLoaded = pluginInstance.load(bot, configService, env);
     bot.emit('message', 'otherperson', '#tenor', '.tenor the office');
 
     // ASSERT
@@ -63,7 +63,7 @@ it('does not search tenor without search phrase', () => {
     bot.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
 
     // ACT
-    const pluginLoaded = tenorPlugin.load(bot);
+    const pluginLoaded = tenorPlugin.load(bot, configService, env);
 
     bot.emit('message#', 'otherperson', '#tenor', '.tenor ');
 

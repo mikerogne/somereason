@@ -19,9 +19,11 @@ class ConsoleLoggerPlugin {
      * Must return true, indicating successful plugin loading.
      *
      * @param client
+     * @param configService
+     * @param env
      * @returns {boolean}
      */
-    load(client) {
+    load(client, configService, env) {
         this.client = client;
 
         this.client.addListener('registered', message => {

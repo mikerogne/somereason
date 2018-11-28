@@ -1,0 +1,9 @@
+{
+  "NODE_ENV": "testing",
+  "ALGOLIA_APP_ID": "testing",
+  "ALGOLIA_API_KEY": "testing",
+  "ALGOLIA_DOCS_BRANCH": "master",
+  "GIPHY_API_KEY": "testing",
+  "TENOR_API_KEY": "testing",
+  "YT_API_KEY": "testing"
+}

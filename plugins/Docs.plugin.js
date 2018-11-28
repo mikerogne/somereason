@@ -1,9 +1,3 @@
-/**
- * Usage: An API key is required, and this shouldn't be in version control obviously.
- * So we'll just use (for now) an environment variable to pass this into node.
- *
- * Example: ALGOLIA_API_KEY="api-key-here" ALGOLIA_APP_ID="app-id-here" ALGOLIA_DOCS_BRANCH="5.7" node index.js
- */
 const algoliasearch = require('algoliasearch');
 
 class Docs {
@@ -11,12 +5,14 @@ class Docs {
         this.client = null;
         this.algoliaClient = null;
         this.algoliaIndex = null;
+        this.env = {};
     }
 
-    load(client) {
+    load(client, configService, env) {
         this.client = client;
+        this.env = env;
 
-        if (!process.env.ALGOLIA_APP_ID || !process.env.ALGOLIA_API_KEY) {
+        if (!this.env.ALGOLIA_APP_ID || !this.env.ALGOLIA_API_KEY) {
             return false;
         }
 
@@ -41,11 +37,11 @@ class Docs {
     search(query) {
         return new Promise((resolve, reject) => {
             if (!this.algoliaClient) {
-                this.algoliaClient = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_API_KEY);
+                this.algoliaClient = algoliasearch(this.env.ALGOLIA_APP_ID, this.env.ALGOLIA_API_KEY);
                 this.algoliaIndex = this.algoliaClient.initIndex('docs');
             }
 
-            const branch = process.env.ALGOLIA_DOCS_BRANCH || 'master';
+            const branch = this.config.env('ALGOLIA_DOCS_BRANCH') || 'master';
             const search = this.algoliaIndex.search(query, { tagFilters: branch })
                                .then(result => {
                                    if (result.hits.length > 0) {

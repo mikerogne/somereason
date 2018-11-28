@@ -1,10 +1,7 @@
 const events = require('events');
 
-beforeEach(() => {
-    process.env.ALGOLIA_APP_ID = 'app-id';
-    process.env.ALGOLIA_API_KEY = 'api-key';
-    process.env.ALGOLIA_DOCS_BRANCH = '5.7';
-});
+const env = require('../../config/jest-env.json');
+const configService = null;
 
 it('shows docs', done => {
     // ARRANGE
@@ -17,7 +14,7 @@ it('shows docs', done => {
     pluginInstance.search = jest.fn(query => Promise.resolve('https://laravel.com/docs/5.7/http-tests - HTTP Tests'));
 
     // ACT
-    const pluginLoaded = pluginInstance.load(bot);
+    const pluginLoaded = pluginInstance.load(bot, configService, env);
     bot.emit('message', 'otherperson', '#docs', '.docs http tests');
 
     // ASSERT
@@ -44,7 +41,7 @@ it('shows docs for master', done => {
     pluginInstance.search = jest.fn(query => Promise.resolve('https://laravel.com/docs/master/http-tests - HTTP Tests'));
 
     // ACT
-    const pluginLoaded = pluginInstance.load(bot);
+    const pluginLoaded = pluginInstance.load(bot, configService, env);
     bot.emit('message', 'otherperson', '#docs', '.docs http tests');
 
     // ASSERT
@@ -69,7 +66,7 @@ it('says no results found', done => {
     pluginInstance.search = jest.fn(query => Promise.reject('No results found.'));
 
     // ACT
-    const pluginLoaded = pluginInstance.load(bot);
+    const pluginLoaded = pluginInstance.load(bot, configService, env);
     bot.emit('message', 'otherperson', '#docs', '.docs FAKE NEWS FAKE NEWS FAKE NEWS FAKE NEWS FAKE NEWS');
 
     // ASSERT

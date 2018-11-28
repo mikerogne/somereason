@@ -1,20 +1,13 @@
-/**
- * Usage: An API key is required, and this shouldn't be in version control obviously.
- * So we'll just use (for now) an environment variable to pass this into node.
- *
- * Example: YT_API_KEY="api-key-here" node index.js
- */
-
 class Youtube {
     constructor() {
         this.client = null;
         this.search = require('youtube-search');
     }
 
-    load(client) {
+    load(client, configService, env) {
         this.client = client;
 
-        if (!process.env.YT_API_KEY) {
+        if (!env.YT_API_KEY) {
             return false;
         }
 
@@ -23,7 +16,7 @@ class Youtube {
                 const query = text.replace('.yt ', '');
                 const options = {
                     maxResults: 1,
-                    key: process.env.YT_API_KEY,
+                    key: env.YT_API_KEY,
                 };
 
                 this.search(query, options, (err, results) => {

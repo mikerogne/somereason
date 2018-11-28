@@ -1,12 +1,12 @@
 const events = require('events');
-
-process.env.YT_API_KEY = 'fake-api-key';
+const configService = null;
+const env = require('../../config/jest-env.json');
 
 it('gives youtube link', done => {
     // ARRANGE
     const pluginInstance = require('../../plugins/Youtube.plugin.js');
 
-    // Mock for giphy lookup. Don't want to hit API.
+    // Mock for YT lookup. Don't want to hit API.
     pluginInstance.search = jest.fn((query, options, callback) => {
         callback(null, [{
             id: '31g0YE61PLQ',
@@ -20,7 +20,7 @@ it('gives youtube link', done => {
     client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
 
     // ACT
-    const pluginLoaded = pluginInstance.load(client);
+    const pluginLoaded = pluginInstance.load(client, configService, env);
     client.emit('message', 'otherperson', '#some-channel', '.yt michael scott no');
 
     // ASSERT
@@ -46,7 +46,7 @@ it('says no results found', done => {
     client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
 
     // ACT
-    const pluginLoaded = pluginInstance.load(client);
+    const pluginLoaded = pluginInstance.load(client, configService, env);
     client.emit('message', 'otherperson', '#some-channel', '.yt fadklsfklsklalk');
 
     // ASSERT
@@ -67,7 +67,7 @@ it('does not search youtube without search phrase', () => {
     client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
 
     // ACT
-    const pluginLoaded = giphyPlugin.load(client);
+    const pluginLoaded = giphyPlugin.load(client, configService, env);
 
     client.emit('message#', 'otherperson', '#giphy', '.yt ');
     client.emit('message', 'otherperson', 'somereason', '.yt ');
