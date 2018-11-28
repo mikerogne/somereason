@@ -12,6 +12,8 @@ class Youtube {
         }
 
         client.addListener('message', (from, channel, text, message) => {
+            if(configService.ignoringUser(message)) { return; }
+
             if (text.startsWith('.yt ') && text.length > 4) {
                 const query = text.replace('.yt ', '');
                 const options = {

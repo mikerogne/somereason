@@ -1,5 +1,7 @@
 const events = require('events');
-const configService = null;
+const Config = require('../../lib/Config');
+
+const configService = new Config;
 const env = require('../../config/jest-env.json');
 
 it('gives youtube link', done => {
@@ -75,4 +77,35 @@ it('does not search youtube without search phrase', () => {
     // ASSERT
     expect(pluginLoaded).toBe(true);
     expect(client.say.mock.calls.length).toBe(0);
+});
+
+it('does not respond to ignored user', done => {
+    // ARRANGE
+    const pluginInstance = require('../../plugins/Youtube.plugin.js');
+
+    // Mock for YT lookup. Don't want to hit API.
+    pluginInstance.search = jest.fn((query, options, callback) => {
+        callback(null, [{
+            id: '31g0YE61PLQ',
+            link: 'https://www.youtube.com/watch?v=31g0YE61PLQ',
+            title: 'Video Title Here',
+        }]);
+    });
+
+    const client = new events.EventEmitter();
+    client.nick = 'somereason';
+    client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
+
+    const configService = new Config;
+    configService.ignoringUser = jest.fn(() => true);
+
+    // ACT
+    const pluginLoaded = pluginInstance.load(client, configService, env);
+    client.emit('message', 'otherperson', '#some-channel', '.yt michael scott no');
+
+    // ASSERT
+    expect(pluginLoaded).toBe(true);
+    expect(client.say.mock.calls.length).toBe(0); // Bot should NOT have responded.
+
+    done();
 });

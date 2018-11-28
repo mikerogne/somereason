@@ -7,6 +7,8 @@ class HeartPlugin {
         this.client = client;
 
         client.addListener('message#', (from, channel, text, message) => {
+            if(configService.ignoringUser(message)) { return; }
+
             const lovelyMessages = [
                 `${client.nick}: <3`,
                 `${client.nick}:<3`,
@@ -21,6 +23,8 @@ class HeartPlugin {
         });
 
         client.addListener('message#', (from, channel, text, message) => {
+            if(configService.ignoringUser(message)) { return; }
+
             const lovelyMessages = [
                 `${client.nick}: </3`,
                 `${client.nick}:</3`,

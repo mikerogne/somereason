@@ -13,6 +13,8 @@ class Tenor {
         }
 
         client.addListener('message', (from, channel, text, message) => {
+            if(configService.ignoringUser(message)) { return; }
+
             if (text.startsWith('.tenor ') && text.length > 7) {
                 const query = text.replace('.tenor ', '');
                 const destination = channel === this.client.nick ? from : channel;

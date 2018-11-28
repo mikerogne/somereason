@@ -17,6 +17,8 @@ class Docs {
         }
 
         client.addListener('message', (from, channel, text, message) => {
+            if(configService.ignoringUser(message)) { return; }
+
             if (text.startsWith('.docs ') && text.length > 7) {
                 const query = text.replace('.docs ', '');
                 const destination = channel === this.client.nick ? from : channel;

@@ -1,6 +1,6 @@
 const events = require('events');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const Config = require('../../lib/Config');
 
 const admins = [
@@ -18,7 +18,7 @@ beforeEach(() => {
     fs.writeFileSync.mockReturnValue(true);
 
     // Mock the loadAuthorizedUsers() method. Always return above admins.
-    // Using Array.slice() to get new array rather than reference to original array.
+    // Using Array.slice() to get new array (shallow copy) rather than reference to original array.
     adminPlugin.loadAuthorizedUsers = jest.fn(() => admins.slice());
 
     const bot = new events.EventEmitter();
@@ -176,3 +176,134 @@ describe('IRC Commands', () => {
     });
 });
 
+describe('Ignore / Unignore', () => {
+    it('adds user to ignore list', done => {
+        // ARRANGE
+        const realadmin = 'realadmin!~ident@unaffiliated/org';
+        const trollUserObject = {
+            nick: 'troll',
+            user: '~troll',
+            host: 'unaffiliated/troll',
+            realname: 'realtroll',
+            account: 'troll',
+        };
+
+        // Start with empty aray for ignored users.
+        adminPlugin.ignoredUsers = [];
+
+        adminPlugin.client.whois = jest.fn((user, callback) => {
+            callback(trollUserObject);
+        });
+
+        fs.writeFileSync = jest.fn(() => true);
+
+        // ACT
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', {
+            prefix: realadmin
+        });
+
+        // ASSERT
+        // Should have 1 ignored user.
+        expect(adminPlugin.ignoredUsers.length).toBe(1);
+
+        // Should be writing to config/ignored_users.json
+        expect(fs.writeFileSync.mock.calls[0][0]).toBe(path.join(__dirname, '../../config/ignored_users.json'));
+        expect(fs.writeFileSync.mock.calls[0][1]).toBe(JSON.stringify([trollUserObject]));
+        done();
+    });
+
+    it('removes user from ignore list', done => {
+        // ARRANGE
+        const realadmin = 'realadmin!~ident@unaffiliated/org';
+        const trollUserObject = {
+            nick: 'troll',
+            user: '~troll',
+            host: 'unaffiliated/troll',
+            realname: 'realtroll',
+            account: 'troll',
+        };
+
+        // Started with one ignored user
+        adminPlugin.ignoredUsers = [trollUserObject];
+
+        adminPlugin.client.whois = jest.fn((user, callback) => {
+            callback(trollUserObject);
+        });
+
+        fs.writeFileSync = jest.fn(() => true);
+
+        // ACT
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.unignore troll', {
+            prefix: realadmin
+        });
+
+        // ASSERT
+        // Should have 0 ignored users.
+        expect(adminPlugin.ignoredUsers.length).toBe(0);
+
+        // Should be writing to config/ignored_users.json
+        expect(fs.writeFileSync.mock.calls[0][0]).toBe(path.join(__dirname, '../../config/ignored_users.json'));
+        expect(fs.writeFileSync.mock.calls[0][1]).toBe('[]');
+        done();
+    });
+
+    it('does not add user to ignore list that does not exist', done => {
+        // ARRANGE
+        const realadmin = 'realadmin!~ident@unaffiliated/org';
+        const trollUserObject = {
+            nick: 'non_existent_user',
+        };
+
+        // Start with empty aray for ignored users.
+        adminPlugin.ignoredUsers = [];
+
+        adminPlugin.client.whois = jest.fn((user, callback) => {
+            callback(trollUserObject);
+        });
+
+        fs.writeFileSync = jest.fn(() => true);
+
+        // ACT
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', {
+            prefix: realadmin
+        });
+
+        // ASSERT
+        // Should have 0 ignored users.
+        expect(adminPlugin.ignoredUsers.length).toBe(0);
+
+        // Should be writing to config/ignored_users.json
+        expect(fs.writeFileSync.mock.calls.length).toBe(0);
+        done();
+    });
+
+    it('does not ignore user when non-admin requests it', done => {
+        // ARRANGE
+        const nonadmin = 'nonadmin!~ident@unaffiliated/org';
+        const trollUserObject = {
+            nick: 'non_existent_user',
+        };
+
+        // Start with empty aray for ignored users.
+        adminPlugin.ignoredUsers = [];
+
+        adminPlugin.client.whois = jest.fn((user, callback) => {
+            callback(trollUserObject);
+        });
+
+        fs.writeFileSync = jest.fn(() => true);
+
+        // ACT
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', {
+            prefix: nonadmin
+        });
+
+        // ASSERT
+        // Should have 0 ignored users.
+        expect(adminPlugin.ignoredUsers.length).toBe(0);
+
+        // Should be writing to config/ignored_users.json
+        expect(fs.writeFileSync.mock.calls.length).toBe(0);
+        done();
+    });
+});

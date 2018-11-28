@@ -1,7 +1,8 @@
 const events = require('events');
+const Config = require('../../lib/Config');
 
 const env = require('../../config/jest-env.json');
-const configService = null;
+const configService = new Config;
 
 it('shows docs', done => {
     // ARRANGE
@@ -93,6 +94,30 @@ it('does not search without search phrase', done => {
     // ACT
     const pluginLoaded = pluginInstance.load(bot, configService, env);
     bot.emit('message', 'otherperson', '#docs', '.docs ');
+
+    // ASSERT
+    process.nextTick(() => {
+        expect(pluginLoaded).toBe(true);
+        expect(bot.say.mock.calls.length).toBe(0); // Bot should NOT have responded.
+        done();
+    });
+});
+
+it('does not respond to ignored user', done => {
+    // ARRANGE
+    const bot = new events.EventEmitter();
+    bot.nick = 'somereason';
+    bot.say = jest.fn();
+
+    const pluginInstance = require('../../plugins/Docs.plugin.js');
+
+    const configService = new Config();
+    configService.ignoringUser = jest.fn(() => true);
+    pluginInstance.search = jest.fn();
+
+    // ACT
+    const pluginLoaded = pluginInstance.load(bot, configService, env);
+    bot.emit('message', 'otherperson', '#docs', '.docs testing');
 
     // ASSERT
     process.nextTick(() => {

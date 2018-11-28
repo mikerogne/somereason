@@ -29,6 +29,8 @@ class EightBallPlugin {
         this.client = client;
 
         client.addListener('message', (from, channel, text, message) => {
+            if(configService.ignoringUser(message)) { return; }
+
             if (text.startsWith('.8ball ') && text.length > 7) {
                 const destination = channel === this.client.nick ? from : channel;
                 const response = channel === this.client.nick ? this.getResponse() : `${from}: ${this.getResponse()}`;

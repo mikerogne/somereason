@@ -14,12 +14,14 @@ class Admin {
         this.configService = null;
         this.client = null;
         this.authorizedUsers = [];
+        this.ignoredUsers = [];
     }
 
     load(client, configService, env) {
         this.client = client;
         this.configService = configService;
         this.authorizedUsers = this.loadAuthorizedUsers();
+        this.ignoredUsers = this.loadIgnoredUsers();
 
         this.client.addListener('message', (from, to, text, message) => {
             if (text.startsWith(`${client.nick}: trust `) && this.isAuthorized(message.prefix)) {
@@ -37,9 +39,69 @@ class Admin {
             if (text.startsWith(`${client.nick}: part `) && this.isAuthorized(message.prefix)) {
                 return this.partChannel(text.replace(`${client.nick}: part `, ''));
             }
+
+            if (text.startsWith(`.ignore `) && this.isAuthorized(message.prefix)) {
+                return this.ignoreUser(text.replace(`.ignore `, ''));
+            }
+
+            if (text.startsWith(`.unignore `) && this.isAuthorized(message.prefix)) {
+                return this.unignoreUser(text.replace(`.unignore `, ''));
+            }
         });
 
         return true;
+    }
+
+    loadIgnoredUsers() {
+        this.ignoredUsers = require('../config/ignored_users.json');
+    }
+
+    ignoreUser(user) {
+        this.client.whois(user, whois => {
+            // If the user exists, we'll have all data. Otherwise, we will only have 'nick'.
+
+            if (!whois.host) {
+                return false;
+            }
+
+            const ignored = {
+                nick: whois.nick, // 'nickname'
+                user: whois.user, // '~ident'
+                host: whois.host, // 'unaffiliated/host'
+                realname: whois.realname, // 'realname'
+                account: whois.account, // 'account-if-registered' (main nick)
+            };
+
+            this._addToIgnoreList(ignored);
+        });
+    }
+
+    unignoreUser(user) {
+        this.client.whois(user, whois => {
+            const ignored = {
+                nick: whois.nick, // 'nickname'
+                user: whois.user, // '~ident'
+                host: whois.host, // 'unaffiliated/host'
+                realname: whois.realname, // 'realname'
+                account: whois.account, // 'account-if-registered' (main nick)
+            };
+
+            this._removeFromIgnoreList(ignored);
+        });
+    }
+
+    _addToIgnoreList(ignored) {
+        this.ignoredUsers.push(ignored);
+
+        fs.writeFileSync(path.join(__dirname, '../config/ignored_users.json'), JSON.stringify(this.ignoredUsers));
+    }
+
+    _removeFromIgnoreList(ignored) {
+        this.ignoredUsers = this.ignoredUsers.filter(
+            u => JSON.stringify(u) !== JSON.stringify(ignored)
+        );
+
+        fs.writeFileSync(path.join(__dirname, '../config/ignored_users.json'), JSON.stringify(this.ignoredUsers));
     }
 
     isAuthorized(user) {

@@ -1,5 +1,7 @@
 const events = require('events');
-const configService = null;
+const Config = require('../../lib/Config');
+
+const configService = new Config;
 const env = require('../../config/jest-env.json');
 
 it('gives giphy link', done => {
@@ -73,6 +75,36 @@ it('does not search giphy without search phrase', () => {
     const pluginLoaded = giphyPlugin.load(client, configService, env);
 
     client.emit('message#', 'otherperson', '#giphy', '.giphy ');
+
+    // ASSERT
+    expect(pluginLoaded).toBe(true);
+    expect(client.say.mock.calls.length).toBe(0);
+});
+
+it('does not respond to ignored user', () => {
+    // ARRANGE
+    const pluginInstance = require('../../plugins/Giphy.plugin.js');
+
+    const client = new events.EventEmitter();
+    client.nick = 'somereason';
+    client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
+
+    const configService = new Config;
+    configService.ignoringUser = jest.fn(() => true);
+
+    // Mock for giphy lookup. Don't want to hit API.
+    pluginInstance.giphyPlugin.search = jest.fn((searchOptions, callback) => {
+        callback(null, {
+            pagination: { count: 1 },
+            data: [{ url: 'https://giphy.com/mock-url' }]
+        });
+    });
+
+
+    // ACT
+    const pluginLoaded = pluginInstance.load(client, configService, env);
+
+    client.emit('message#', 'otherperson', '#giphy', '.giphy testing');
 
     // ASSERT
     expect(pluginLoaded).toBe(true);

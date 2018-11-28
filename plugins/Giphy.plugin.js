@@ -14,6 +14,8 @@ class Giphy {
         this.giphyPlugin = require('giphy-api')(env.GIPHY_API_KEY);
 
         client.addListener('message', (from, channel, text, message) => {
+            // if(configService.ignoringUser(message)) { return; }
+
             if (text.startsWith('.giphy ') && text.length > 7) {
                 const query = text.replace('.giphy ', '');
                 this.giphyPlugin.search({
