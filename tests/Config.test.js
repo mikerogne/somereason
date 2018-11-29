@@ -4,13 +4,14 @@ const Config = require('../lib/Config');
 
 const pathToRealConfig = path.join(__dirname, '../config/client.json');
 const pathToTestConfig = path.join(__dirname, '../config/jest-client.json');
+const originalConfig = fs.readFileSync(pathToRealConfig, 'utf8');
 
 beforeEach(() => {
     fs.copyFileSync(pathToRealConfig, pathToTestConfig);
 });
 
 afterEach(() => {
-    fs.copyFileSync(pathToRealConfig, pathToTestConfig);
+    fs.writeFileSync(pathToRealConfig, originalConfig);
 });
 
 it('Can read config', () => {

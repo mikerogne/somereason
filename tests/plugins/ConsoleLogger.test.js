@@ -1,9 +1,16 @@
 const events = require('events');
 
+const originalLog = global.console.log;
+
+afterEach(() => {
+    global.console.log = originalLog;
+});
+
 it('Should log messages to console', () => {
     // ARRANGE
+    global.console.log = jest.fn();
+
     const dt = (new Date()).toLocaleString();
-    const logSpy = jest.spyOn(global.console, 'log');
     const client = new events.EventEmitter();
     client.nick = 'somereason';
 
@@ -36,9 +43,9 @@ it('Should log messages to console', () => {
     // ASSERT
     expect(pluginLoaded).toBe(true); // Plugin should be loaded.
 
-    expect(logSpy).toHaveBeenCalledTimes(3);
+    expect(global.console.log.mock.calls.length).toBe(3);
 
-    expect(logSpy).toHaveBeenCalledWith(`[${dt}] #heart <otherperson> Hello, world!`);
-    expect(logSpy).toHaveBeenCalledWith(`[${dt}] NOTICE <otherperson> What a lovely day it is.`);
-    expect(logSpy).toHaveBeenCalledWith(`[${dt}] PRIVMSG (ACTION) <otherperson> laughs heartily at Carlos Matos videos`);
+    expect(global.console.log.mock.calls[0][0]).toBe(`[${dt}] #heart <otherperson> Hello, world!`);
+    expect(global.console.log.mock.calls[1][0]).toBe(`[${dt}] NOTICE <otherperson> What a lovely day it is.`);
+    expect(global.console.log.mock.calls[2][0]).toBe(`[${dt}] PRIVMSG (ACTION) <otherperson> laughs heartily at Carlos Matos videos`);
 });
