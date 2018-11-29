@@ -2,22 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const Config = require('../lib/Config');
 
-const pathToRealConfig = path.join(__dirname, '../config/client.json');
+// SETUP
+const original = {
+    authorized_users: fs.readFileSync(path.join(__dirname, '../config/authorized_users.json')),
+    ignored_users: fs.readFileSync(path.join(__dirname, '../config/ignored_users.json')),
+    jest_json: fs.readFileSync(path.join(__dirname, '../config/jest-client.json')),
+    client_json: fs.readFileSync(path.join(__dirname, '../config/client.json')),
+};
+
 const pathToTestConfig = path.join(__dirname, '../config/jest-client.json');
-const originalConfig = fs.readFileSync(pathToRealConfig, 'utf8');
 
-beforeEach(() => {
-    fs.copyFileSync(pathToRealConfig, pathToTestConfig);
-});
+beforeEach(() => {});
 
+// RESTORE ORIGINAL CONTENT AFTER EACH TEST
 afterEach(() => {
-    fs.writeFileSync(pathToRealConfig, originalConfig);
+    fs.writeFileSync(path.join(__dirname, '../config/authorized_users.json'), original.authorized_users);
+    fs.writeFileSync(path.join(__dirname, '../config/ignored_users.json'), original.ignored_users);
+    fs.writeFileSync(path.join(__dirname, '../config/jest-client.json'), original.jest_json);
+    fs.writeFileSync(path.join(__dirname, '../config/client.json'), original.client_json);
 });
 
 it('Can read config', () => {
     // ARRANGE
     const configService = new Config(pathToTestConfig);
-    const expectedObject = require(pathToTestConfig);
+    const expectedObject = JSON.parse(fs.readFileSync(pathToTestConfig, 'utf8'));
 
     // ACT
     const configObject = configService.getConfig();
@@ -29,7 +37,7 @@ it('Can read config', () => {
 it('Can write config', () => {
     // ARRANGE
     const configService = new Config(pathToTestConfig);
-    const testConfig = require(pathToTestConfig);
+    const testConfig = JSON.parse(fs.readFileSync(pathToTestConfig, 'utf8'));
 
     testConfig.channels.push('#mike-was-here');
 

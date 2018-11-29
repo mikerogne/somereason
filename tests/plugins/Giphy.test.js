@@ -100,7 +100,6 @@ it('does not respond to ignored user', () => {
         });
     });
 
-
     // ACT
     const pluginLoaded = pluginInstance.load(client, configService, env);
 
