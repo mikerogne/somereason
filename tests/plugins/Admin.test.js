@@ -3,37 +3,38 @@ const path = require('path');
 const fs = require('fs');
 const Config = require('../../lib/Config');
 
-const originalAuthorizedUsers = fs.readFileSync(path.join(__dirname, '../../config/authorized_users.json'));
-afterEach(() => {
-    fs.writeFileSync(path.join(__dirname, '../../config/authorized_users.json'), originalAuthorizedUsers);
-});
+// SETUP
+const original = {
+    authorized_users: fs.readFileSync(path.join(__dirname, '../../config/authorized_users.json')),
+    ignored_users: fs.readFileSync(path.join(__dirname, '../../config/ignored_users.json')),
+    jest_json: fs.readFileSync(path.join(__dirname, '../../config/jest-client.json')),
+    client_json: fs.readFileSync(path.join(__dirname, '../../config/client.json')),
+};
 
+const adminPlugin = require('../../plugins/Admin.plugin.js');
 const admins = [
     'realadmin!~ident@unaffiliated/org',
     'realadmin2!~ident@unaffiliated/org',
 ];
 
-const adminPlugin = require('../../plugins/Admin.plugin.js');
+const bot = new events.EventEmitter();
+bot.nick = 'somereason';
+bot.say = jest.fn();
 
+adminPlugin.loadAuthorizedUsers = jest.fn(() => admins.slice());
+adminPlugin.load(bot, new Config(path.join(__dirname, '../../config/jest-client.json')));
+
+// CLEAR MOCK(S) AFTER EACH TEST
 beforeEach(() => {
-    // We don't want to read/write any files.
-    jest.mock('fs');
-    const fs = require('fs');
-    fs.existsSync.mockReturnValue(true);
-    fs.writeFileSync.mockReturnValue(true);
+    bot.say.mockClear();
+});
 
-    // Mock the loadAuthorizedUsers() method. Always return above admins.
-    // Using Array.slice() to get new array (shallow copy) rather than reference to original array.
-    adminPlugin.loadAuthorizedUsers = jest.fn(() => admins.slice());
-
-    const bot = new events.EventEmitter();
-    bot.nick = 'somereason';
-
-    const pathToRealConfig = path.join(__dirname, '../../config/client.json');
-    const pathToTestConfig = path.join(__dirname, '../../config/jest-client.json');
-
-    fs.copyFileSync(pathToRealConfig, pathToTestConfig);
-    adminPlugin.load(bot, new Config(pathToTestConfig));
+// RESTORE ORIGINAL CONTENT AFTER EACH TEST
+afterEach(() => {
+    fs.writeFileSync(path.join(__dirname, '../../config/authorized_users.json'), original.authorized_users);
+    fs.writeFileSync(path.join(__dirname, '../../config/ignored_users.json'), original.ignored_users);
+    fs.writeFileSync(path.join(__dirname, '../../config/jest-client.json'), original.jest_json);
+    fs.writeFileSync(path.join(__dirname, '../../config/client.json'), original.client_json);
 });
 
 describe('Authorization', () => {
@@ -199,6 +200,7 @@ describe('Ignore / Unignore', () => {
         adminPlugin.client.whois = jest.fn((user, callback) => {
             callback(trollUserObject);
         });
+        bot.say = jest.fn();
 
         fs.writeFileSync = jest.fn(() => true);
 
@@ -208,13 +210,19 @@ describe('Ignore / Unignore', () => {
         });
 
         // ASSERT
-        // Should have 1 ignored user.
-        expect(adminPlugin.ignoredUsers.length).toBe(1);
+        process.nextTick(() => {
+            // Should have 1 ignored user.
+            expect(adminPlugin.ignoredUsers.length).toBe(1);
 
-        // Should be writing to config/ignored_users.json
-        expect(fs.writeFileSync.mock.calls[0][0]).toBe(path.join(__dirname, '../../config/ignored_users.json'));
-        expect(fs.writeFileSync.mock.calls[0][1]).toBe(JSON.stringify([trollUserObject]));
-        done();
+            // Should be writing to config/ignored_users.json
+            expect(fs.writeFileSync.mock.calls[0][0]).toBe(path.join(__dirname, '../../config/ignored_users.json'));
+            expect(fs.writeFileSync.mock.calls[0][1]).toBe(JSON.stringify([trollUserObject]));
+
+            // Bot should say, "<nick> who?"
+            expect(bot.say.mock.calls[0][0]).toBe('#channel');
+            expect(bot.say.mock.calls[0][1]).toBe('troll who? :)');
+            done();
+        });
     });
 
     it('removes user from ignore list', done => {
@@ -243,13 +251,19 @@ describe('Ignore / Unignore', () => {
         });
 
         // ASSERT
-        // Should have 0 ignored users.
-        expect(adminPlugin.ignoredUsers.length).toBe(0);
+        process.nextTick(() => {
+            // Should have 0 ignored users.
+            expect(adminPlugin.ignoredUsers.length).toBe(0);
 
-        // Should be writing to config/ignored_users.json
-        expect(fs.writeFileSync.mock.calls[0][0]).toBe(path.join(__dirname, '../../config/ignored_users.json'));
-        expect(fs.writeFileSync.mock.calls[0][1]).toBe('[]');
-        done();
+            // Should be writing to config/ignored_users.json
+            expect(fs.writeFileSync.mock.calls[0][0]).toBe(path.join(__dirname, '../../config/ignored_users.json'));
+            expect(fs.writeFileSync.mock.calls[0][1]).toBe('[]');
+
+            expect(bot.say.mock.calls.length).toBe(1);
+            expect(bot.say.mock.calls[0][0]).toBe('#channel');
+            expect(bot.say.mock.calls[0][1]).toBe('Oh there\'s troll!');
+            done();
+        });
     });
 
     it('does not add user to ignore list that does not exist', done => {
@@ -274,12 +288,15 @@ describe('Ignore / Unignore', () => {
         });
 
         // ASSERT
-        // Should have 0 ignored users.
-        expect(adminPlugin.ignoredUsers.length).toBe(0);
+        process.nextTick(() => {
+            // Should have 0 ignored users.
+            console.log(adminPlugin.ignoredUsers);
+            expect(adminPlugin.ignoredUsers.length).toBe(0);
 
-        // Should be writing to config/ignored_users.json
-        expect(fs.writeFileSync.mock.calls.length).toBe(0);
-        done();
+            // Should be writing to config/ignored_users.json
+            expect(fs.writeFileSync.mock.calls.length).toBe(0);
+            done();
+        });
     });
 
     it('does not ignore user when non-admin requests it', done => {

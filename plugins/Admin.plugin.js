@@ -41,11 +41,22 @@ class Admin {
             }
 
             if (text.startsWith(`.ignore `) && this.isAuthorized(message.prefix)) {
-                return this.ignoreUser(text.replace(`.ignore `, '').trim());
+                const nick = text.slice().replace(`.ignore `, '').trim();
+
+                this.ignoreUser(nick)
+                    .then(() => {
+                        this.client.say(to === this.client.nick ? from : to, `${nick} who? :)`);
+                    })
+                    .catch(() => {});
             }
 
             if (text.startsWith(`.unignore `) && this.isAuthorized(message.prefix)) {
-                return this.unignoreUser(text.replace(`.unignore `, '').trim());
+                const nick = text.slice().replace(`.unignore `, '').trim();
+                this.unignoreUser(nick)
+                    .then(() => {
+                        this.client.say(to === this.client.nick ? from : to, `Oh there's ${nick}!`);
+                    })
+                    .catch(() => {});
             }
         });
 
@@ -53,35 +64,44 @@ class Admin {
     }
 
     ignoreUser(user) {
-        this.client.whois(user, whois => {
-            // If the user exists, we'll have all data. Otherwise, we will only have 'nick'.
-            if (!whois.host) {
-                return false;
-            }
+        return new Promise((resolve, reject) => {
+            this.client.whois(user, whois => {
+                // If the user exists, we'll have all data. Otherwise, we will only have 'nick'.
+                if (!whois.host) {
+                    return reject(whois);
+                }
 
-            const ignored = {
-                nick: whois.nick, // 'nickname'
-                user: whois.user, // '~ident'
-                host: whois.host, // 'unaffiliated/host'
-                realname: whois.realname, // 'realname'
-                account: whois.account, // 'account-if-registered' (main nick)
-            };
+                const ignored = {
+                    nick: whois.nick, // 'nickname'
+                    user: whois.user, // '~ident'
+                    host: whois.host, // 'unaffiliated/host'
+                    realname: whois.realname, // 'realname'
+                    account: whois.account, // 'account-if-registered' (main nick)
+                };
 
-            this._addToIgnoreList(ignored);
-        });
+                this._addToIgnoreList(ignored);
+                resolve(whois);
+            });
+        })
     }
 
     unignoreUser(user) {
-        this.client.whois(user, whois => {
-            const ignored = {
-                nick: whois.nick, // 'nickname'
-                user: whois.user, // '~ident'
-                host: whois.host, // 'unaffiliated/host'
-                realname: whois.realname, // 'realname'
-                account: whois.account, // 'account-if-registered' (main nick)
-            };
+        return new Promise((resolve, reject) => {
+            this.client.whois(user, whois => {
+                const ignored = {
+                    nick: whois.nick, // 'nickname'
+                    user: whois.user, // '~ident'
+                    host: whois.host, // 'unaffiliated/host'
+                    realname: whois.realname, // 'realname'
+                    account: whois.account, // 'account-if-registered' (main nick)
+                };
 
-            this._removeFromIgnoreList(ignored);
+                if (this._removeFromIgnoreList(ignored)) {
+                    resolve();
+                } else {
+                    reject();
+                }
+            });
         });
     }
 
@@ -93,12 +113,21 @@ class Admin {
     }
 
     _removeFromIgnoreList(ignored) {
+        const originalLength = this.ignoredUsers.length;
+
         this.ignoredUsers = this.ignoredUsers.filter(
             u => JSON.stringify(u) !== JSON.stringify(ignored)
         );
 
+        if (this.ignoredUsers.length === originalLength) {
+            // No change.
+            return false;
+        }
+
         fs.writeFileSync(path.join(this.configService.pathToIgnoredUsers), JSON.stringify(this.ignoredUsers));
         this.configService.reloadIgnoredUsers();
+
+        return true;
     }
 
     isAuthorized(user) {
