@@ -11,22 +11,26 @@ const original = {
     client_json: fs.readFileSync(path.join(__dirname, '../../config/client.json')),
 };
 
-const adminPlugin = require('../../plugins/Admin.plugin.js');
-const admins = [
-    'realadmin!~ident@unaffiliated/org',
-    'realadmin2!~ident@unaffiliated/org',
+const nonAdmins = [
+    { nick: 'nonadmin', user: '~fakenews', host: 'maga/org' },
 ];
+const admins = [
+    { nick: 'realadmin', user: '~ident', host: 'unaffiliated/org' },
+    { nick: 'realadmin2', user: '~ident', host: 'unaffiliated/org' },
+];
+const adminPlugin = require('../../plugins/Admin.plugin.js');
+adminPlugin.loadAuthorizedUsers = jest.fn(() => JSON.parse(JSON.stringify(admins)));
 
 const bot = new events.EventEmitter();
 bot.nick = 'somereason';
 bot.say = jest.fn();
 
-adminPlugin.loadAuthorizedUsers = jest.fn(() => admins.slice());
 adminPlugin.load(bot, new Config(path.join(__dirname, '../../config/jest-client.json')));
 
 // CLEAR MOCK(S) AFTER EACH TEST
 beforeEach(() => {
     bot.say.mockClear();
+    adminPlugin.authorizedUsers = JSON.parse(JSON.stringify(admins));
 });
 
 // RESTORE ORIGINAL CONTENT AFTER EACH TEST
@@ -38,154 +42,173 @@ afterEach(() => {
 });
 
 describe('Authorization', () => {
-    it('Authorizes "realadmin"', () => {
+    it('Authorizes "realadmin"', done => {
         // ARRANGE
-        const userToCheck = 'realadmin!~ident@unaffiliated/org';
-
-        // Mock this specific function - we want it return THIS array of authorized users.
-        adminPlugin.loadAuthorizedUsers = jest.fn(() => admins);
+        const userToCheck = {
+            nick: 'realadmin',
+            user: '~ident',
+            host: 'unaffiliated/org',
+        };
 
         // ACT
         const authorized = adminPlugin.isAuthorized(userToCheck);
 
         // ASSERT
         expect(authorized).toBe(true);
+        done();
     });
 
-    it('Rejects "fakeadmin"', () => {
+    it('Rejects "fakeadmin"', done => {
         // ARRANGE
         const userToCheck = 'fakeadmin!~ident@unaffiliated/org';
-
-        // Mock this specific function - we want it return THIS array of authorized users.
-        adminPlugin.loadAuthorizedUsers = jest.fn(() => admins);
 
         // ACT
         const authorized = adminPlugin.isAuthorized(userToCheck);
 
         // ASSERT
         expect(authorized).toBe(false);
+        done();
     });
 });
 
 describe('IRC Commands', () => {
-    it('Adds user when admin requests it', () => {
+    it('Adds user when admin requests it', done => {
         // ARRANGE
-        const realadmin = 'realadmin!~ident@unaffiliated/org';
+        const honestPerson = {
+            nick: 'honestperson',
+            user: '~abe',
+            host: 'unaffiliated/org'
+        };
+
+        adminPlugin.client.whois = jest.fn((user, callback) => callback(honestPerson));
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', 'somereason: trust honestperson!~ident@unaffiliated/org', {
-            prefix: realadmin,
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.trust honestperson', admins[0]);
 
         // ASSERT
-        expect(adminPlugin.authorizedUsers.includes('honestperson!~ident@unaffiliated/org')).toBe(true);
+        process.nextTick(() => {
+            expect(bot.say.mock.calls[0][0]).toBe('#channel');
+            expect(bot.say.mock.calls[0][1]).toBe(`honestperson: your wish is my command.`);
+
+            const index = adminPlugin.authorizedUsers.findIndex(u => u.nick === honestPerson.nick && u.user === honestPerson.user && u.host === honestPerson.host);
+            expect(index).not.toBe(-1);
+
+            done();
+        });
     });
 
-    it('Removes user when admin requests it', () => {
+    it('Removes user when admin requests it', done => {
         // ARRANGE
-        const realadmin = 'realadmin!~ident@unaffiliated/org';
+        const honestPerson = {
+            nick: 'honestperson',
+            user: '~abe',
+            host: 'unaffiliated/org'
+        };
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', 'somereason: untrust realadmin2!~ident@unaffiliated/org', {
-            prefix: realadmin,
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.untrust honestperson', admins[0]);
 
         // ASSERT
-        expect(adminPlugin.authorizedUsers.includes('realadmin2!~ident@unaffiliated/org')).toBe(false);
+        process.nextTick(() => {
+            expect(bot.say.mock.calls[0][0]).toBe('#channel');
+            expect(bot.say.mock.calls[0][1]).toBe(`honestperson: bye felicia.`);
+
+            const index = adminPlugin.authorizedUsers.findIndex(u => u.nick === honestPerson.nick && u.user === honestPerson.nick && u.host === honestPerson.host);
+            expect(index).toBe(-1);
+
+            done();
+        });
     });
 
-    it('Does not add user when non-admin requests it', () => {
+    it('Does not add user when non-admin requests it', done => {
         // ARRANGE
-        const nonadmin = 'nonadmin!~ident@unaffiliated/org';
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', 'somereason: trust newadmin!~ident@unaffiliated/org', {
-            prefix: nonadmin,
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.trust honestperson', nonAdmins[0]);
 
         // ASSERT
-        expect(adminPlugin.authorizedUsers.length).toBe(2);
+        process.nextTick(() => {
+            expect(adminPlugin.authorizedUsers.length).toBe(2);
+            done();
+        });
     });
 
-    it('Does not remove user when non-admin requests it', () => {
+    it('Does not remove user when non-admin requests it', done => {
         // ARRANGE
-        const nonadmin = 'nonadmin!~ident@unaffiliated/org';
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', 'somereason: untrust realadmin2!~ident@unaffiliated/org', {
-            prefix: nonadmin,
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.untrust honestperson', nonAdmins[0]);
 
         // ASSERT
-        expect(adminPlugin.authorizedUsers.length).toBe(2);
+        process.nextTick(() => {
+            expect(adminPlugin.authorizedUsers.length).toBe(2);
+            done();
+        });
     });
 
-    it('Joins channel when admin requests it', () => {
+    it('Joins channel when admin requests it', done => {
         // ARRANGE
-        const realadmin = 'realadmin!~ident@unaffiliated/org';
         adminPlugin.client.join = jest.fn(); // don't actually JOIN anything.
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', 'somereason: join #newchannel', {
-            prefix: realadmin,
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.join #newchannel', admins[0]);
 
         // ASSERT
         expect(adminPlugin.client.join.mock.calls.length).toBe(1);
         expect(adminPlugin.client.join.mock.calls[0][0]).toBe('#newchannel');
 
         expect(adminPlugin.configService.getConfig().channels).toContain('#newchannel');
+        done();
     });
 
-    it('Parts channel when admin requests it', () => {
+    it('Parts channel when admin requests it', done => {
         // ARRANGE
-        const realadmin = 'realadmin!~ident@unaffiliated/org';
         adminPlugin.client.part = jest.fn(); // don't actually JOIN anything.
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', 'somereason: part #newchannel', {
-            prefix: realadmin,
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.part #newchannel', admins[0]);
 
         // ASSERT
         expect(adminPlugin.client.part.mock.calls.length).toBe(1);
         expect(adminPlugin.client.part.mock.calls[0][0]).toBe('#newchannel');
         expect(adminPlugin.configService.getConfig().channels).not.toContain('#newchannel');
+        done();
     });
 
-    it('Does not join channel when non-admin requests it', () => {
+    it('Does not join channel when non-admin requests it', done => {
         // ARRANGE
         const nonadmin = 'nonadmin!~ident@unaffiliated/org';
         adminPlugin.client.part = jest.fn(); // don't actually JOIN anything.
 
         // ACT
-        adminPlugin.client.emit('message', 'nonadmin', '#channel', 'somereason: part #newchannel', {
+        adminPlugin.client.emit('message', 'nonadmin', '#channel', '.part #newchannel', {
             prefix: nonadmin,
         });
 
         // ASSERT
         expect(adminPlugin.client.part.mock.calls.length).toBe(0);
+        done();
     });
 
-    it('Does not part channel when non-admin requests it', () => {
+    it('Does not part channel when non-admin requests it', done => {
         // ARRANGE
         const nonadmin = 'nonadmin!~ident@unaffiliated/org';
         adminPlugin.client.part = jest.fn(); // don't actually JOIN anything.
 
         // ACT
-        adminPlugin.client.emit('message', 'nonadmin', '#channel', 'somereason: part #newchannel', {
+        adminPlugin.client.emit('message', 'nonadmin', '#channel', '.part #newchannel', {
             prefix: nonadmin,
         });
 
         // ASSERT
         expect(adminPlugin.client.part.mock.calls.length).toBe(0);
+        done();
     });
 });
 
 describe('Ignore / Unignore', () => {
     it('adds user to ignore list', done => {
         // ARRANGE
-        const realadmin = 'realadmin!~ident@unaffiliated/org';
         const trollUserObject = {
             nick: 'troll',
             user: '~troll',
@@ -197,17 +220,12 @@ describe('Ignore / Unignore', () => {
         // Start with empty aray for ignored users.
         adminPlugin.ignoredUsers = [];
 
-        adminPlugin.client.whois = jest.fn((user, callback) => {
-            callback(trollUserObject);
-        });
-        bot.say = jest.fn();
+        adminPlugin.client.whois = jest.fn((user, callback) => callback(trollUserObject));
 
         fs.writeFileSync = jest.fn(() => true);
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', {
-            prefix: realadmin
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', admins[0]);
 
         // ASSERT
         process.nextTick(() => {
@@ -227,7 +245,6 @@ describe('Ignore / Unignore', () => {
 
     it('removes user from ignore list', done => {
         // ARRANGE
-        const realadmin = 'realadmin!~ident@unaffiliated/org';
         const trollUserObject = {
             nick: 'troll',
             user: '~troll',
@@ -246,9 +263,7 @@ describe('Ignore / Unignore', () => {
         fs.writeFileSync = jest.fn(() => true);
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', '.unignore troll', {
-            prefix: realadmin
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.unignore troll', admins[0]);
 
         // ASSERT
         process.nextTick(() => {

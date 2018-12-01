@@ -24,38 +24,40 @@ class Admin {
         this.ignoredUsers = JSON.parse(fs.readFileSync(configService.pathToIgnoredUsers, 'utf8'));
 
         this.client.addListener('message', (from, to, text, message) => {
-            if (text.startsWith(`${client.nick}: trust `) && this.isAuthorized(message.prefix)) {
-                return this.addUser(text.replace(`${client.nick}: trust `, ''));
+            if (text.startsWith(`.trust `) && this.isAuthorized(message)) {
+                const nick = text.slice().replace(`.trust `, '').trim();
+
+                return this.addUser(nick)
+                           .then(() => this.client.say(to === this.client.nick ? from : to, `${nick}: your wish is my command.`));
             }
 
-            if (text.startsWith(`${client.nick}: untrust `) && this.isAuthorized(message.prefix)) {
-                return this.removeUser(text.replace(`${client.nick}: untrust `, ''));
+            if (text.startsWith(`.untrust `) && this.isAuthorized(message)) {
+                const nick = text.slice().replace(`.untrust `, '').trim();
+
+                return this.removeUser(nick)
+                           .then(() => this.client.say(to === this.client.nick ? from : to, `${nick}: bye felicia.`));
             }
 
-            if (text.startsWith(`${client.nick}: join `) && this.isAuthorized(message.prefix)) {
-                return this.joinChannel(text.replace(`${client.nick}: join `, ''));
+            if (text.startsWith(`.join `) && this.isAuthorized(message)) {
+                return this.joinChannel(text.replace(`.join `, ''));
             }
 
-            if (text.startsWith(`${client.nick}: part `) && this.isAuthorized(message.prefix)) {
-                return this.partChannel(text.replace(`${client.nick}: part `, ''));
+            if (text.startsWith(`.part `) && this.isAuthorized(message)) {
+                return this.partChannel(text.replace(`.part `, ''));
             }
 
-            if (text.startsWith(`.ignore `) && this.isAuthorized(message.prefix)) {
+            if (text.startsWith(`.ignore `) && this.isAuthorized(message)) {
                 const nick = text.slice().replace(`.ignore `, '').trim();
 
                 this.ignoreUser(nick)
-                    .then(() => {
-                        this.client.say(to === this.client.nick ? from : to, `${nick} who? :)`);
-                    })
+                    .then(() => this.client.say(to === this.client.nick ? from : to, `${nick} who? :)`))
                     .catch(() => {});
             }
 
-            if (text.startsWith(`.unignore `) && this.isAuthorized(message.prefix)) {
+            if (text.startsWith(`.unignore `) && this.isAuthorized(message)) {
                 const nick = text.slice().replace(`.unignore `, '').trim();
                 this.unignoreUser(nick)
-                    .then(() => {
-                        this.client.say(to === this.client.nick ? from : to, `Oh there's ${nick}!`);
-                    })
+                    .then(() => this.client.say(to === this.client.nick ? from : to, `Oh there's ${nick}!`))
                     .catch(() => {});
             }
         });
@@ -64,6 +66,78 @@ class Admin {
     }
 
     ignoreUser(user) {
+        return this._whoisUser(user)
+                   .then(userObject => this._addToIgnoreList(userObject));
+    }
+
+    unignoreUser(user) {
+        return this._whoisUser(user)
+                   .then(userObject => this._removeFromIgnoreList(userObject));
+    }
+
+    isAuthorized(user) {
+        return this.authorizedUsers.findIndex(u => u.nick === user.nick && u.user === u.user && u.host === u.host) !== -1;
+    }
+
+    loadAuthorizedUsers() {
+        if (!fs.existsSync(pathToAuthorizedUsers)) {
+            fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify([], null, 2));
+
+            return [];
+        }
+
+        return JSON.parse(fs.readFileSync(pathToAuthorizedUsers, 'utf8'));
+    }
+
+    addUser(user) {
+        return new Promise((resolve, reject) => {
+            this.client.whois(user, whois => {
+                this.authorizedUsers.push({
+                    nick: whois.nick,
+                    user: whois.user,
+                    host: whois.host,
+                });
+            });
+
+            fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
+
+            resolve();
+        });
+    }
+
+    removeUser(user) {
+        return new Promise((resolve, reject) => {
+            this.client.whois(user, whois => {
+                this.authorizedUsers = this.authorizedUsers.filter(u => u.nick !== user.nick);
+
+                fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
+
+                resolve();
+            });
+        });
+    }
+
+    joinChannel(channel) {
+        this.client.join(channel);
+
+        const config = this.configService.getConfig();
+        config.channels.push(channel);
+
+        this.configService.updateConfig(config);
+    }
+
+    partChannel(channel) {
+        this.client.part(channel);
+
+        const config = this.configService.getConfig();
+
+        if (config.channels.includes(channel)) {
+            config.channels = config.channels.filter(c => c !== channel);
+            this.configService.updateConfig(config);
+        }
+    }
+
+    _whoisUser(user) {
         return new Promise((resolve, reject) => {
             this.client.whois(user, whois => {
                 // If the user exists, we'll have all data. Otherwise, we will only have 'nick'.
@@ -71,7 +145,7 @@ class Admin {
                     return reject(whois);
                 }
 
-                const ignored = {
+                const userObject = {
                     nick: whois.nick, // 'nickname'
                     user: whois.user, // '~ident'
                     host: whois.host, // 'unaffiliated/host'
@@ -79,28 +153,7 @@ class Admin {
                     account: whois.account, // 'account-if-registered' (main nick)
                 };
 
-                this._addToIgnoreList(ignored);
-                resolve(whois);
-            });
-        })
-    }
-
-    unignoreUser(user) {
-        return new Promise((resolve, reject) => {
-            this.client.whois(user, whois => {
-                const ignored = {
-                    nick: whois.nick, // 'nickname'
-                    user: whois.user, // '~ident'
-                    host: whois.host, // 'unaffiliated/host'
-                    realname: whois.realname, // 'realname'
-                    account: whois.account, // 'account-if-registered' (main nick)
-                };
-
-                if (this._removeFromIgnoreList(ignored)) {
-                    resolve();
-                } else {
-                    reject();
-                }
+                resolve(userObject);
             });
         });
     }
@@ -128,52 +181,6 @@ class Admin {
         this.configService.reloadIgnoredUsers();
 
         return true;
-    }
-
-    isAuthorized(user) {
-        return this.authorizedUsers.includes(user);
-    }
-
-    loadAuthorizedUsers() {
-        if (!fs.existsSync(pathToAuthorizedUsers)) {
-            fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify([], null, 2));
-
-            return [];
-        }
-
-        return JSON.parse(fs.readFileSync(pathToAuthorizedUsers, 'utf8'));
-    }
-
-    addUser(user) {
-        this.authorizedUsers.push(user);
-
-        fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
-    }
-
-    removeUser(user) {
-        this.authorizedUsers = this.authorizedUsers.filter(authedUser => authedUser !== user);
-
-        fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
-    }
-
-    joinChannel(channel) {
-        this.client.join(channel);
-
-        const config = this.configService.getConfig();
-        config.channels.push(channel);
-
-        this.configService.updateConfig(config);
-    }
-
-    partChannel(channel) {
-        this.client.part(channel);
-
-        const config = this.configService.getConfig();
-
-        if (config.channels.includes(channel)) {
-            config.channels = config.channels.filter(c => c !== channel);
-            this.configService.updateConfig(config);
-        }
     }
 }
 
