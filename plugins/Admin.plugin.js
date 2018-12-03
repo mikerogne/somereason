@@ -108,7 +108,7 @@ class Admin {
     removeUser(user) {
         return new Promise((resolve, reject) => {
             this.client.whois(user, whois => {
-                this.authorizedUsers = this.authorizedUsers.filter(u => u.nick !== user.nick);
+                this.authorizedUsers = this.authorizedUsers.filter(u => u.nick !== user);
 
                 fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
 

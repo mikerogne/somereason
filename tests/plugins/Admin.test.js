@@ -116,6 +116,9 @@ describe('IRC Commands', () => {
             const index = adminPlugin.authorizedUsers.findIndex(u => u.nick === honestPerson.nick && u.user === honestPerson.nick && u.host === honestPerson.host);
             expect(index).toBe(-1);
 
+            const authorizedUsers = JSON.parse(fs.readFileSync(path.join(__dirname, '../../config/authorized_users.json'), 'utf8'));
+            expect(authorizedUsers.findIndex(u => u.nick === honestPerson.nick)).toBe(-1);
+
             done();
         });
     });
@@ -305,7 +308,6 @@ describe('Ignore / Unignore', () => {
         // ASSERT
         process.nextTick(() => {
             // Should have 0 ignored users.
-            console.log(adminPlugin.ignoredUsers);
             expect(adminPlugin.ignoredUsers.length).toBe(0);
 
             // Should be writing to config/ignored_users.json
