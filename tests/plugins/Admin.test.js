@@ -286,7 +286,6 @@ describe('Ignore / Unignore', () => {
 
     it('does not add user to ignore list that does not exist', done => {
         // ARRANGE
-        const realadmin = 'realadmin!~ident@unaffiliated/org';
         const trollUserObject = {
             nick: 'non_existent_user',
         };
@@ -301,9 +300,7 @@ describe('Ignore / Unignore', () => {
         fs.writeFileSync = jest.fn(() => true);
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', {
-            prefix: realadmin
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', admins[0]);
 
         // ASSERT
         process.nextTick(() => {
@@ -318,7 +315,6 @@ describe('Ignore / Unignore', () => {
 
     it('does not ignore user when non-admin requests it', done => {
         // ARRANGE
-        const nonadmin = 'nonadmin!~ident@unaffiliated/org';
         const trollUserObject = {
             nick: 'non_existent_user',
         };
@@ -333,9 +329,7 @@ describe('Ignore / Unignore', () => {
         fs.writeFileSync = jest.fn(() => true);
 
         // ACT
-        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', {
-            prefix: nonadmin
-        });
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.ignore troll', nonAdmins[0]);
 
         // ASSERT
         // Should have 0 ignored users.
