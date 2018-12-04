@@ -24,6 +24,7 @@ class Admin {
         this.ignoredUsers = JSON.parse(fs.readFileSync(configService.pathToIgnoredUsers, 'utf8'));
 
         this.client.addListener('message', (from, to, text, message) => {
+            // .trust / .untrust
             if (text.startsWith(`.trust `) && this.isAuthorized(message)) {
                 const nick = text.slice().replace(`.trust `, '').trim();
 
@@ -38,6 +39,7 @@ class Admin {
                            .then(() => this.client.say(to === this.client.nick ? from : to, `${nick}: bye felicia.`));
             }
 
+            // .join / .part
             if (text.startsWith(`.join `) && this.isAuthorized(message)) {
                 return this.joinChannel(text.replace(`.join `, ''));
             }
@@ -46,19 +48,37 @@ class Admin {
                 return this.partChannel(text.replace(`.part `, ''));
             }
 
+            // .ignore / .unignore
             if (text.startsWith(`.ignore `) && this.isAuthorized(message)) {
                 const nick = text.slice().replace(`.ignore `, '').trim();
 
-                this.ignoreUser(nick)
-                    .then(() => this.client.say(to === this.client.nick ? from : to, `${nick} who? :)`))
-                    .catch(() => {});
+                return this.ignoreUser(nick)
+                           .then(() => this.client.say(to === this.client.nick ? from : to, `${nick} who? :)`))
+                           .catch(() => {});
             }
 
             if (text.startsWith(`.unignore `) && this.isAuthorized(message)) {
                 const nick = text.slice().replace(`.unignore `, '').trim();
-                this.unignoreUser(nick)
-                    .then(() => this.client.say(to === this.client.nick ? from : to, `Oh there's ${nick}!`))
-                    .catch(() => {});
+
+                return this.unignoreUser(nick)
+                           .then(() => this.client.say(to === this.client.nick ? from : to, `Oh there's ${nick}!`))
+                           .catch(() => {});
+            }
+
+            // .say
+            let matches = text.match(/^\.say to (.+?) (.+)/);
+            if (matches && this.isAuthorized(message)) {
+                const [, destination, message] = matches;
+
+                return this.client.say(destination, message);
+            }
+
+            // .emote
+            matches = text.match(/^\.emote to (.+?) (.+)/);
+            if (matches && this.isAuthorized(message)) {
+                const [, destination, message] = matches;
+
+                return this.client.action(destination, message);
             }
         });
 

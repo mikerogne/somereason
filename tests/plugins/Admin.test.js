@@ -340,3 +340,59 @@ describe('Ignore / Unignore', () => {
         done();
     });
 });
+
+describe('Speak as bot', () => {
+    it('lets admin speak as bot', done => {
+        // ARRANGE
+
+        // ACT
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.say to #another-channel This is a test message', admins[0]);
+
+        // ASSERT
+        expect(adminPlugin.client.say.mock.calls.length).toBe(1);
+        expect(adminPlugin.client.say.mock.calls[0][0]).toBe('#another-channel');
+        expect(adminPlugin.client.say.mock.calls[0][1]).toBe('This is a test message');
+
+        done();
+    });
+
+    it('lets admin emote as bot', done => {
+        // ARRANGE
+        adminPlugin.client.action = jest.fn();
+
+        // ACT
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.emote to #another-channel High-fives Mike', admins[0]);
+
+        // ASSERT
+        expect(adminPlugin.client.action.mock.calls.length).toBe(1);
+        expect(adminPlugin.client.action.mock.calls[0][0]).toBe('#another-channel');
+        expect(adminPlugin.client.action.mock.calls[0][1]).toBe('High-fives Mike');
+
+        done();
+    });
+
+    it('does not let non-admin speak as bot', done => {
+        // ARRANGE
+
+        // ACT
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.say to #another-channel This is a test message', nonAdmins[0]);
+
+        // ASSERT
+        expect(adminPlugin.client.say.mock.calls.length).toBe(0);
+
+        done();
+    });
+
+    it('does not let non-admin emote as bot', done => {
+        // ARRANGE
+        adminPlugin.client.action = jest.fn();
+
+        // ACT
+        adminPlugin.client.emit('message', 'realadmin', '#channel', '.emote to #another-channel High-fives Mike', nonAdmins[0]);
+
+        // ASSERT
+        expect(adminPlugin.client.action.mock.calls.length).toBe(0);
+
+        done();
+    });
+});
