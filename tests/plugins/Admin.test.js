@@ -71,7 +71,7 @@ describe('Authorization', () => {
     });
 });
 
-describe('IRC Commands', () => {
+describe('Users', () => {
     it('Adds user when admin requests it', done => {
         // ARRANGE
         const honestPerson = {
@@ -148,7 +148,11 @@ describe('IRC Commands', () => {
             done();
         });
     });
+});
 
+describe('Ignore / Unignore', () => {});
+
+describe('Channels', () => {
     it('Joins channel when admin requests it', done => {
         // ARRANGE
         adminPlugin.client.join = jest.fn(); // don't actually JOIN anything.
@@ -180,13 +184,10 @@ describe('IRC Commands', () => {
 
     it('Does not join channel when non-admin requests it', done => {
         // ARRANGE
-        const nonadmin = 'nonadmin!~ident@unaffiliated/org';
         adminPlugin.client.part = jest.fn(); // don't actually JOIN anything.
 
         // ACT
-        adminPlugin.client.emit('message', 'nonadmin', '#channel', '.part #newchannel', {
-            prefix: nonadmin,
-        });
+        adminPlugin.client.emit('message', 'nonadmin', '#channel', '.part #newchannel', nonAdmins[0]);
 
         // ASSERT
         expect(adminPlugin.client.part.mock.calls.length).toBe(0);
@@ -195,16 +196,32 @@ describe('IRC Commands', () => {
 
     it('Does not part channel when non-admin requests it', done => {
         // ARRANGE
-        const nonadmin = 'nonadmin!~ident@unaffiliated/org';
         adminPlugin.client.part = jest.fn(); // don't actually JOIN anything.
 
         // ACT
-        adminPlugin.client.emit('message', 'nonadmin', '#channel', '.part #newchannel', {
-            prefix: nonadmin,
-        });
+        adminPlugin.client.emit('message', 'nonadmin', '#channel', '.part #newchannel', nonAdmins[0]);
 
         // ASSERT
         expect(adminPlugin.client.part.mock.calls.length).toBe(0);
+        done();
+    });
+
+});
+
+describe('Nickname', () => {
+    it('updates nick when admin requests it', done => {
+        // ARRANGE
+        adminPlugin.client.nick = jest.fn();
+
+        // ACT
+        adminPlugin.client.emit('message', 'admin', '#channel', '.nick NewNickname', admins[0]);
+
+        // ASSERT
+        const newConfig = adminPlugin.configService.getConfig();
+
+        expect(adminPlugin.client.nick.mock.calls.length).toBe(1);
+        expect(newConfig.nickname).toBe('NewNickname');
+
         done();
     });
 });
