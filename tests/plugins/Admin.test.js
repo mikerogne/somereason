@@ -211,7 +211,7 @@ describe('Channels', () => {
 describe('Nickname', () => {
     it('updates nick when admin requests it', done => {
         // ARRANGE
-        adminPlugin.client.nick = jest.fn();
+        adminPlugin.client.send = jest.fn();
 
         // ACT
         adminPlugin.client.emit('message', 'admin', '#channel', '.nick NewNickname', admins[0]);
@@ -219,7 +219,9 @@ describe('Nickname', () => {
         // ASSERT
         const newConfig = adminPlugin.configService.getConfig();
 
-        expect(adminPlugin.client.nick.mock.calls.length).toBe(1);
+        expect(adminPlugin.client.send.mock.calls.length).toBe(1);
+        expect(adminPlugin.client.send.mock.calls[0][0]).toBe('NICK');
+        expect(adminPlugin.client.send.mock.calls[0][1]).toBe('NewNickname');
         expect(newConfig.nickname).toBe('NewNickname');
 
         done();

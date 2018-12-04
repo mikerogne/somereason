@@ -85,7 +85,7 @@ class Admin {
             if (text.startsWith('.nick ') && this.isAuthorized(message)) {
                 // Update nick
                 const newNick = text.replace(`.nick `, '').trim();
-                this.client.nick(newNick);
+                this.client.send('NICK', newNick);
 
                 // Update config file
                 const config = this.configService.getConfig();
