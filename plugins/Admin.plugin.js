@@ -132,6 +132,7 @@ class Admin {
                 });
             });
 
+            console.log(`Writing to ${pathToAuthorizedUsers}: ${JSON.stringify(this.authorizedUsers, null, 2)}`);
             fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
 
             resolve();
