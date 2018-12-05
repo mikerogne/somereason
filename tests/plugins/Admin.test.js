@@ -132,6 +132,7 @@ describe('Users', () => {
         // ASSERT
         process.nextTick(() => {
             expect(adminPlugin.authorizedUsers.length).toBe(2);
+            expect(bot.say.mock.calls.length).toBe(0);
             done();
         });
     });
@@ -149,8 +150,6 @@ describe('Users', () => {
         });
     });
 });
-
-describe('Ignore / Unignore', () => {});
 
 describe('Channels', () => {
     it('Joins channel when admin requests it', done => {

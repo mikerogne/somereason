@@ -108,6 +108,7 @@ class Admin {
     }
 
     isAuthorized(user) {
+        console.log(`Checking if authorized: ${JSON.stringify(user, null, 2)}`);
         return this.authorizedUsers.findIndex(u => u.nick === user.nick && u.user === u.user && u.host === u.host) !== -1;
     }
 
