@@ -1,5 +1,7 @@
 [
-  "realadmin1!~ident@unaffiliated/org",
-  "realadmin2!~ident@unaffiliated/org",
-  "realadmin3!~ident@unaffiliated/org"
+  {
+    "nick": "realadmin",
+    "user": "~realadmin",
+    "host": "unaffiliated/realadmin"
+  }
 ]
