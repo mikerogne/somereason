@@ -124,18 +124,15 @@ class Admin {
     addUser(user) {
         return new Promise((resolve, reject) => {
             this.client.whois(user, whois => {
-                process.nextTick(() => {
-                    // Add authorized user to array.
-                    this.authorizedUsers.push({
-                        nick: whois.nick,
-                        user: whois.user,
-                        host: whois.host,
-                    });
+                // Add authorized user to array.
+                this.authorizedUsers.push({
+                    nick: whois.nick,
+                    user: whois.user,
+                    host: whois.host,
                 });
 
                 console.log(`Writing to ${pathToAuthorizedUsers}: ${JSON.stringify(this.authorizedUsers, null, 2)}`);
                 fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
-
                 resolve();
             });
         });
