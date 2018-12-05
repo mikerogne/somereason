@@ -108,9 +108,12 @@ class Admin {
     }
 
     isAuthorized(user) {
+        const index = this.authorizedUsers.findIndex(u => u.nick === user.nick && u.user === u.user && u.host === u.host);
         console.log(`Checking if authorized: ${JSON.stringify(user, null, 2)}`);
-        console.log(JSON.stringify(this.authorizedUsers, null, 2));
-        return this.authorizedUsers.findIndex(u => u.nick === user.nick && u.user === u.user && u.host === u.host) !== -1;
+        console.log(`this.authorizedUsers: ${JSON.stringify(this.authorizedUsers, null, 2)}`);
+        console.log(`index=${index}`);
+
+        return index !== -1;
     }
 
     loadAuthorizedUsers() {
@@ -134,6 +137,8 @@ class Admin {
             });
 
             fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
+
+            // Should also reload authorized users.
 
             resolve();
         });
