@@ -108,12 +108,7 @@ class Admin {
     }
 
     isAuthorized(user) {
-        const index = this.authorizedUsers.findIndex(u => u.nick === user.nick && u.user === u.user && u.host === u.host);
-        console.log(`Checking if authorized: ${JSON.stringify(user, null, 2)}`);
-        console.log(`this.authorizedUsers: ${JSON.stringify(this.authorizedUsers, null, 2)}`);
-        console.log(`index=${index}`);
-
-        return index !== -1;
+        return this.authorizedUsers.findIndex(u => u.nick === user.nick && u.user === user.user && u.host === user.host) !== -1;
     }
 
     loadAuthorizedUsers() {
@@ -129,6 +124,7 @@ class Admin {
     addUser(user) {
         return new Promise((resolve, reject) => {
             this.client.whois(user, whois => {
+                // Add authorized user to array.
                 this.authorizedUsers.push({
                     nick: whois.nick,
                     user: whois.user,
@@ -137,8 +133,6 @@ class Admin {
             });
 
             fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
-
-            // Should also reload authorized users.
 
             resolve();
         });
