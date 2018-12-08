@@ -1,12 +1,12 @@
 const events = require('events');
-const Config = require('../../src/lib/Config');
+const Config = require('../../dist/lib/Config');
 
 const configService = new Config;
 const env = require('../../config/jest-env.json');
 
 it('gives tenor link', done => {
     // ARRANGE
-    const pluginInstance = require('../../src/plugins/Tenor.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Tenor.plugin.js');
 
     // Mock for Tenor lookup. Don't want to hit API.
     pluginInstance.tenorSearch = jest.fn((query, apiKey, limit = 1) => Promise.resolve('https://tenor.com/mock-url'));
@@ -32,7 +32,7 @@ it('gives tenor link', done => {
 
 it('says no results found', done => {
     // ARRANGE
-    const pluginInstance = require('../../src/plugins/Tenor.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Tenor.plugin.js');
 
     // Mock for tenor lookup. Don't want to hit API.
     pluginInstance.tenorSearch = jest.fn((query, apiKey, limit = 1) => Promise.reject('No results found.'));
@@ -58,7 +58,7 @@ it('says no results found', done => {
 
 it('does not search tenor without search phrase', () => {
     // ARRANGE
-    const tenorPlugin = require('../../src/plugins/Tenor.plugin.js');
+    const tenorPlugin = require('../../dist/plugins/Tenor.plugin.js');
 
     const bot = new events.EventEmitter();
     bot.nick = 'somereason';
@@ -76,7 +76,7 @@ it('does not search tenor without search phrase', () => {
 
 it('does not respond to ignored user', done => {
     // ARRANGE
-    const pluginInstance = require('../../src/plugins/Tenor.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Tenor.plugin.js');
 
     // Mock for Tenor lookup. Don't want to hit API.
     pluginInstance.tenorSearch = jest.fn((query, apiKey, limit = 1) => Promise.resolve('https://tenor.com/mock-url'));

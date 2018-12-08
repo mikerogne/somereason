@@ -2,15 +2,17 @@
   "name": "mrogne-node-bot",
   "version": "1.0.0",
   "description": "node bot",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "start": "node index.js",
     "test": "jest",
-    "watch": "jest --watchAll"
+    "watch": "jest --watchAll",
+    "build": "rm -rf dist && tsc -p ."
   },
   "author": "Mike Rogne <mikerogne@users.noreply.github.com> (https://github.com/mikerogne)",
   "license": "ISC",
   "dependencies": {
+    "@types/node": "^10.12.12",
     "algoliasearch": "^3.30.0",
     "axios": "^0.18.0",
     "giphy-api": "^2.0.0",
@@ -18,6 +20,8 @@
     "youtube-search": "^1.1.3"
   },
   "devDependencies": {
-    "jest": "^23.6.0"
+    "jest": "^23.6.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.2.2"
   }
 }

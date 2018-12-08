@@ -1,7 +1,7 @@
 const events = require('events');
 const path = require('path');
 const fs = require('fs');
-const Config = require('../../src/lib/Config');
+const Config = require('../../dist/lib/Config');
 
 // SETUP
 const original = {
@@ -18,7 +18,7 @@ const admins = [
     { nick: 'realadmin', user: '~ident', host: 'unaffiliated/org' },
     { nick: 'realadmin2', user: '~ident', host: 'unaffiliated/org' },
 ];
-const adminPlugin = require('../../src/plugins/Admin.plugin.js');
+const adminPlugin = require('../../dist/plugins/Admin.plugin.js');
 adminPlugin.loadAuthorizedUsers = jest.fn(() => JSON.parse(JSON.stringify(admins)));
 
 const bot = new events.EventEmitter();

@@ -1,5 +1,5 @@
 const events = require('events');
-const Config = require('../../src/lib/Config');
+const Config = require('../../dist/lib/Config');
 
 const configService = new Config;
 const env = {};
@@ -10,7 +10,7 @@ it('should give a random response', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../src/plugins/Eightball.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Eightball.plugin.js');
 
     // ACT
     const pluginLoaded = pluginInstance.load(bot, configService, env);
@@ -37,7 +37,7 @@ it('does not respond to ignored user', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../src/plugins/Eightball.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Eightball.plugin.js');
     const configService = new Config;
     configService.ignoringUser = jest.fn(() => true);
 

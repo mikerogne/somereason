@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const Config = require('../src/lib/Config');
+const Config = require('../dist/lib/Config');
 
 // SETUP
 const original = {

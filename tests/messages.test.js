@@ -1,4 +1,4 @@
-const utils = require('../src/lib/messages.js');
+const utils = require('../dist/lib/messages.js');
 const botNick = 'somereason';
 
 describe('utils.getContextFromMessage()', () => {

@@ -1,5 +1,5 @@
 const events = require('events');
-const Config = require('../../src/lib/Config');
+const Config = require('../../dist/lib/Config');
 
 const env = require('../../config/jest-env.json');
 const configService = new Config;
@@ -10,7 +10,7 @@ it('shows docs', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../src/plugins/Docs.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Docs.plugin.js');
 
     pluginInstance.search = jest.fn(query => Promise.resolve('https://laravel.com/docs/5.7/http-tests - HTTP Tests'));
 
@@ -37,7 +37,7 @@ it('shows docs for master', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../src/plugins/Docs.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Docs.plugin.js');
 
     pluginInstance.search = jest.fn(query => Promise.resolve('https://laravel.com/docs/master/http-tests - HTTP Tests'));
 
@@ -62,7 +62,7 @@ it('says no results found', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../src/plugins/Docs.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Docs.plugin.js');
 
     pluginInstance.search = jest.fn(query => Promise.reject('No results found.'));
 
@@ -87,7 +87,7 @@ it('does not search without search phrase', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../src/plugins/Docs.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Docs.plugin.js');
 
     pluginInstance.search = jest.fn();
 
@@ -109,7 +109,7 @@ it('does not respond to ignored user', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../src/plugins/Docs.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Docs.plugin.js');
 
     const configService = new Config();
     configService.ignoringUser = jest.fn(() => true);

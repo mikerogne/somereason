@@ -1,5 +1,5 @@
 const events = require('events');
-const Config = require('../../src/lib/Config');
+const Config = require('../../dist/lib/Config');
 
 const configService = new Config;
 const env = {};
@@ -11,7 +11,7 @@ it('Should give a <3 back', () => {
     client.nick = 'somereason';
     client.say = jest.fn();
 
-    const heartPlugin = require('../../src/plugins/Heart.plugin.js');
+    const heartPlugin = require('../../dist/plugins/Heart.plugin.js');
 
     // ACT
     const pluginLoaded = heartPlugin.load(client, configService, env);
@@ -36,7 +36,7 @@ it('Should give a shrug back', () => {
     client.nick = 'somereason';
     client.say = jest.fn();
 
-    const heartPlugin = require('../../src/plugins/Heart.plugin.js');
+    const heartPlugin = require('../../dist/plugins/Heart.plugin.js');
 
     // ACT
     const pluginLoaded = heartPlugin.load(client, configService, env);
@@ -60,7 +60,7 @@ it('does not respond to ignored user', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../src/plugins/Heart.plugin.js');
+    const pluginInstance = require('../../dist/plugins/Heart.plugin.js');
     const configService = new Config;
 
     configService.ignoringUser = jest.fn(() => true);

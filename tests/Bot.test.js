@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const Bot = require('../src/lib/Bot');
+const Bot = require('../dist/lib/Bot');
 const pathToConfig = path.resolve(__dirname, '../config/testing.json');
 
 describe('Bot instantiation', () => {
@@ -20,7 +20,7 @@ describe('Bot instantiation', () => {
     it('can create new bot instance with plugins', done => {
         // ARRANGE
         const expectedJson = JSON.stringify(require(pathToConfig));
-        const totalPlugins = fs.readdirSync(path.join(__dirname, '../src/plugins')).filter(f => f.endsWith('.plugin.js')).length;
+        const totalPlugins = fs.readdirSync(path.join(__dirname, '../dist/plugins')).filter(f => f.endsWith('.plugin.js')).length;
 
         // ACT
         const bot = new Bot(pathToConfig);
