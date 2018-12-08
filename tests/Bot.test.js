@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+// const Bot = require('../dist/lib/Bot');
 const Bot = require('../dist/lib/Bot');
 const pathToConfig = path.resolve(__dirname, '../config/testing.json');
 
@@ -12,6 +13,7 @@ describe('Bot instantiation', () => {
         const bot = new Bot(pathToConfig);
 
         // ASSERT
+        console.log(bot);
         expect(bot).toBeInstanceOf(Bot);
         expect(JSON.stringify(bot.botOptions)).toBe(expectedJson);
         done();

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export default () => {
+export = () => {
     return new Promise((resolve, reject) => {
         fs.readFile(path.join(__dirname, '../../config/env.json'), 'utf8', (err: any, content: string) => {
             if (err) {
