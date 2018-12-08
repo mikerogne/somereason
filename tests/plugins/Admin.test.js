@@ -1,7 +1,7 @@
 const events = require('events');
 const path = require('path');
 const fs = require('fs');
-const Config = require('../../lib/Config');
+const Config = require('../../src/lib/Config');
 
 // SETUP
 const original = {
@@ -18,7 +18,7 @@ const admins = [
     { nick: 'realadmin', user: '~ident', host: 'unaffiliated/org' },
     { nick: 'realadmin2', user: '~ident', host: 'unaffiliated/org' },
 ];
-const adminPlugin = require('../../plugins/Admin.plugin.js');
+const adminPlugin = require('../../src/plugins/Admin.plugin.js');
 adminPlugin.loadAuthorizedUsers = jest.fn(() => JSON.parse(JSON.stringify(admins)));
 
 const bot = new events.EventEmitter();
@@ -110,6 +110,7 @@ describe('Users', () => {
 
         // ASSERT
         process.nextTick(() => {
+            console.log(bot.say);
             expect(bot.say.mock.calls[0][0]).toBe('#channel');
             expect(bot.say.mock.calls[0][1]).toBe(`honestperson: bye felicia.`);
 

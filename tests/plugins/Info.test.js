@@ -1,5 +1,5 @@
 const { EventEmitter } = require('events');
-const Config = require('../../lib/Config');
+const Config = require('../../src/lib/Config');
 
 it('gives bot info', done => {
     // ARRANGE
@@ -7,7 +7,7 @@ it('gives bot info', done => {
     bot.nick = 'somereason';
     bot.say = jest.fn();
 
-    const pluginInstance = require('../../plugins/Info.plugin.js');
+    const pluginInstance = require('../../src/plugins/Info.plugin.js');
     const configService = new Config;
     configService.ignoringUser = jest.fn(() => false);
 

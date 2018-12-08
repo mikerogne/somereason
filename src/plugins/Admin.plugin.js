@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const configPath = path.join(__dirname, '../config');
+const configPath = path.join(__dirname, '../../config');
 const pathToAuthorizedUsers = path.join(configPath, 'authorized_users.json');
 
 /**
@@ -131,7 +131,6 @@ class Admin {
                     host: whois.host,
                 });
 
-                console.log(`Writing to ${pathToAuthorizedUsers}: ${JSON.stringify(this.authorizedUsers, null, 2)}`);
                 fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
                 resolve();
             });

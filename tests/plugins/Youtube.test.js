@@ -1,12 +1,12 @@
 const events = require('events');
-const Config = require('../../lib/Config');
+const Config = require('../../src/lib/Config');
 
 const configService = new Config;
 const env = require('../../config/jest-env.json');
 
 it('gives youtube link', done => {
     // ARRANGE
-    const pluginInstance = require('../../plugins/Youtube.plugin.js');
+    const pluginInstance = require('../../src/plugins/Youtube.plugin.js');
 
     // Mock for YT lookup. Don't want to hit API.
     pluginInstance.search = jest.fn((query, options, callback) => {
@@ -36,7 +36,7 @@ it('gives youtube link', done => {
 
 it('says no results found', done => {
     // ARRANGE
-    const pluginInstance = require('../../plugins/Youtube.plugin.js');
+    const pluginInstance = require('../../src/plugins/Youtube.plugin.js');
 
     // Mock for giphy lookup. Don't want to hit API.
     pluginInstance.search = jest.fn((query, options, callback) => {
@@ -62,7 +62,7 @@ it('says no results found', done => {
 
 it('does not search youtube without search phrase', () => {
     // ARRANGE
-    const giphyPlugin = require('../../plugins/Youtube.plugin.js');
+    const giphyPlugin = require('../../src/plugins/Youtube.plugin.js');
 
     const client = new events.EventEmitter();
     client.nick = 'somereason';
@@ -81,7 +81,7 @@ it('does not search youtube without search phrase', () => {
 
 it('does not respond to ignored user', done => {
     // ARRANGE
-    const pluginInstance = require('../../plugins/Youtube.plugin.js');
+    const pluginInstance = require('../../src/plugins/Youtube.plugin.js');
 
     // Mock for YT lookup. Don't want to hit API.
     pluginInstance.search = jest.fn((query, options, callback) => {

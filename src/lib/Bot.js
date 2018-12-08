@@ -2,7 +2,7 @@ const irc = require('irc-upd');
 const fs = require('fs');
 const path = require('path');
 const Config = require('./Config');
-const env = require('../config/env.json');
+const env = require('../../config/env.json');
 
 class Bot {
     constructor(pathToConfig) {

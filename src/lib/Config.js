@@ -3,9 +3,9 @@ const path = require('path');
 
 class Config {
     constructor(pathToConfig = null, pathToEnv = null, pathToIgnoredUsers = null) {
-        this.pathToConfig = pathToConfig || path.join(__dirname, '../config/client.json');
-        this.pathToEnv = pathToEnv || path.join(__dirname, '../config/env.json');
-        this.pathToIgnoredUsers = pathToIgnoredUsers || path.join(__dirname, '../config/ignored_users.json');
+        this.pathToConfig = pathToConfig || path.join(__dirname, '../../config/client.json');
+        this.pathToEnv = pathToEnv || path.join(__dirname, '../../config/env.json');
+        this.pathToIgnoredUsers = pathToIgnoredUsers || path.join(__dirname, '../../config/ignored_users.json');
 
         this._env = JSON.parse(fs.readFileSync(this.pathToEnv, 'utf8'));
         this._ignoredUsers = JSON.parse(fs.readFileSync(this.pathToIgnoredUsers, 'utf8'));

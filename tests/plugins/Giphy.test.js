@@ -1,12 +1,12 @@
 const events = require('events');
-const Config = require('../../lib/Config');
+const Config = require('../../src/lib/Config');
 
 const configService = new Config;
 const env = require('../../config/jest-env.json');
 
 it('gives giphy link', done => {
     // ARRANGE
-    const pluginInstance = require('../../plugins/Giphy.plugin.js');
+    const pluginInstance = require('../../src/plugins/Giphy.plugin.js');
 
     const client = new events.EventEmitter();
     client.nick = 'somereason';
@@ -36,7 +36,7 @@ it('gives giphy link', done => {
 
 it('says no results found', done => {
     // ARRANGE
-    const pluginInstance = require('../../plugins/Giphy.plugin.js');
+    const pluginInstance = require('../../src/plugins/Giphy.plugin.js');
 
     const client = new events.EventEmitter();
     client.nick = 'somereason';
@@ -65,7 +65,7 @@ it('says no results found', done => {
 
 it('does not search giphy without search phrase', () => {
     // ARRANGE
-    const giphyPlugin = require('../../plugins/Giphy.plugin.js');
+    const giphyPlugin = require('../../src/plugins/Giphy.plugin.js');
 
     const client = new events.EventEmitter();
     client.nick = 'somereason';
@@ -83,7 +83,7 @@ it('does not search giphy without search phrase', () => {
 
 it('does not respond to ignored user', () => {
     // ARRANGE
-    const pluginInstance = require('../../plugins/Giphy.plugin.js');
+    const pluginInstance = require('../../src/plugins/Giphy.plugin.js');
 
     const client = new events.EventEmitter();
     client.nick = 'somereason';
