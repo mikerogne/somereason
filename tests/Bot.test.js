@@ -11,21 +11,22 @@ describe('Bot instantiation', () => {
 
         // ACT
         const bot = new Bot(pathToConfig);
+        bot.initialize();
 
         // ASSERT
-        console.log(bot);
         expect(bot).toBeInstanceOf(Bot);
         expect(JSON.stringify(bot.botOptions)).toBe(expectedJson);
         done();
     });
 
-    it('can create new bot instance with plugins', done => {
+    it('can create new bot instance with plugins', async (done) => {
         // ARRANGE
         const expectedJson = JSON.stringify(require(pathToConfig));
         const totalPlugins = fs.readdirSync(path.join(__dirname, '../dist/plugins')).filter(f => f.endsWith('.plugin.js')).length;
 
         // ACT
         const bot = new Bot(pathToConfig);
+        await bot.initialize();
 
         // ASSERT
         expect(bot).toBeInstanceOf(Bot);

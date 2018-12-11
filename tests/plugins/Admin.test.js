@@ -110,7 +110,6 @@ describe('Users', () => {
 
         // ASSERT
         process.nextTick(() => {
-            console.log(bot.say);
             expect(bot.say.mock.calls[0][0]).toBe('#channel');
             expect(bot.say.mock.calls[0][1]).toBe(`honestperson: bye felicia.`);
 

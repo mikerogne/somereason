@@ -4,7 +4,7 @@
   "description": "node bot",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node dist/index.js",
     "test": "jest",
     "watch": "jest --watchAll",
     "build": "rm -rf dist && tsc -p ."

@@ -22,12 +22,14 @@ class Bot {
         const server = this.botOptions.server || 'chat.freenode.net';
 
         this.client = new irc.Client(server, this.botOptions.nickname, this.botOptions);
-
-        this._registerHandlers();
-        this._loadPlugins();
     }
 
-    _registerHandlers() {
+    async initialize() {
+        this.registerHandlers();
+        await this.loadPlugins();
+    }
+
+    private registerHandlers() {
         this.client.addListener('error', msg => {
             const d = new Date;
 
@@ -35,10 +37,11 @@ class Bot {
         });
     }
 
-    async _loadPlugins() {
+    private async loadPlugins() {
         const basePath = path.join(__dirname, '../plugins');
         const files = fs.readdirSync(basePath);
-        const env = await getEnv();
+
+        const env = JSON.parse(await getEnv());
 
         files.filter(f => f.endsWith('.plugin.js'))
             .forEach(f => {
