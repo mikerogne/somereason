@@ -40,4 +40,4 @@ This project is licensed under the [ISC License](https://opensource.org/licenses
 ## Acknowledgments
 
 - https://github.com/Throne3d/node-irc/
-
+- Shoutout to [asteele](https://github.com/cronoh) for the TypeScript help!
