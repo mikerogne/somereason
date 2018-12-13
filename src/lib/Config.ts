@@ -1,7 +1,8 @@
-import fs from "fs";
-import path from "path";
-import {User} from "../types/User";
-import {EnvJson} from "../types/EnvJson";
+import fs from 'fs';
+import path from 'path';
+import { User } from '../types/User';
+import { EnvJson } from '../types/EnvJson';
+import { BotOptions } from '../types/BotOptions';
 
 class Config {
     pathToConfig: string;
@@ -20,7 +21,7 @@ class Config {
         this.ignoredUsers = JSON.parse(fs.readFileSync(this.pathToIgnoredUsers, 'utf8'));
     }
 
-    getConfig() {
+    getConfig(): BotOptions {
         return JSON.parse(fs.readFileSync(this.pathToConfig, 'utf8'));
     }
 
@@ -37,11 +38,11 @@ class Config {
             return false;
         }
 
-        return this.ignoredUsers.filter((u: User) => {
-            return u.nick.toUpperCase() === checkUser.nick.toUpperCase()
-                || u.user.toUpperCase() === checkUser.user.toUpperCase()
-                || u.host.toUpperCase() === checkUser.host.toUpperCase();
-        }).length > 0;
+        return (
+            this.ignoredUsers.filter((u: User) => {
+                return u.nick.toUpperCase() === checkUser.nick.toUpperCase() || u.user.toUpperCase() === checkUser.user.toUpperCase() || u.host.toUpperCase() === checkUser.host.toUpperCase();
+            }).length > 0
+        );
     }
 
     reloadIgnoredUsers() {

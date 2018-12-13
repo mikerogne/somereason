@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require('fs');
 const path = require('path');
 const configPath = path.join(__dirname, '../../config');
@@ -15,7 +16,7 @@ class Admin {
         this.authorizedUsers = [];
         this.ignoredUsers = [];
     }
-    load(client, configService, env) {
+    load(client, configService, _env) {
         this.client = client;
         this.configService = configService;
         this.authorizedUsers = this.loadAuthorizedUsers();
@@ -23,14 +24,18 @@ class Admin {
         this.client.addListener('message', (from, to, text, message) => {
             // .trust / .untrust
             if (text.startsWith(`.trust `) && this.isAuthorized(message)) {
-                const nick = text.slice().replace(`.trust `, '').trim();
-                return this.addUser(nick)
-                    .then(() => this.client.say(to === this.client.nick ? from : to, `${nick}: your wish is my command.`));
+                const nick = text
+                    .slice()
+                    .replace(`.trust `, '')
+                    .trim();
+                return this.addUser(nick).then(() => this.client.say(to === this.client.nick ? from : to, `${nick}: your wish is my command.`));
             }
             if (text.startsWith(`.untrust `) && this.isAuthorized(message)) {
-                const nick = text.slice().replace(`.untrust `, '').trim();
-                return this.removeUser(nick)
-                    .then(() => this.client.say(to === this.client.nick ? from : to, `${nick}: bye felicia.`));
+                const nick = text
+                    .slice()
+                    .replace(`.untrust `, '')
+                    .trim();
+                return this.removeUser(nick).then(() => this.client.say(to === this.client.nick ? from : to, `${nick}: bye felicia.`));
             }
             // .join / .part
             if (text.startsWith(`.join `) && this.isAuthorized(message)) {
@@ -41,13 +46,19 @@ class Admin {
             }
             // .ignore / .unignore
             if (text.startsWith(`.ignore `) && this.isAuthorized(message)) {
-                const nick = text.slice().replace(`.ignore `, '').trim();
+                const nick = text
+                    .slice()
+                    .replace(`.ignore `, '')
+                    .trim();
                 return this.ignoreUser(nick)
                     .then(() => this.client.say(to === this.client.nick ? from : to, `${nick} who? :)`))
                     .catch(() => { });
             }
             if (text.startsWith(`.unignore `) && this.isAuthorized(message)) {
-                const nick = text.slice().replace(`.unignore `, '').trim();
+                const nick = text
+                    .slice()
+                    .replace(`.unignore `, '')
+                    .trim();
                 return this.unignoreUser(nick)
                     .then(() => this.client.say(to === this.client.nick ? from : to, `Oh there's ${nick}!`))
                     .catch(() => { });
@@ -78,12 +89,10 @@ class Admin {
         return true;
     }
     ignoreUser(user) {
-        return this._whoisUser(user)
-            .then(userObject => this._addToIgnoreList(userObject));
+        return this._whoisUser(user).then(userObject => this._addToIgnoreList(userObject));
     }
     unignoreUser(user) {
-        return this._whoisUser(user)
-            .then(userObject => this._removeFromIgnoreList(userObject));
+        return this._whoisUser(user).then(userObject => this._removeFromIgnoreList(userObject));
     }
     isAuthorized(user) {
         return this.authorizedUsers.findIndex(u => u.nick === user.nick && u.user === user.user && u.host === user.host) !== -1;
@@ -96,13 +105,12 @@ class Admin {
         return JSON.parse(fs.readFileSync(pathToAuthorizedUsers, 'utf8'));
     }
     addUser(user) {
-        return new Promise((resolve, reject) => {
-            this.client.whois(user, whois => {
-                // Add authorized user to array.
+        return new Promise((resolve, _reject) => {
+            this._whoisUser(user).then(userObject => {
                 this.authorizedUsers.push({
-                    nick: whois.nick,
-                    user: whois.user,
-                    host: whois.host,
+                    nick: userObject.nick,
+                    user: userObject.user,
+                    host: userObject.host,
                 });
                 fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
                 resolve();
@@ -110,8 +118,8 @@ class Admin {
         });
     }
     removeUser(user) {
-        return new Promise((resolve, reject) => {
-            this.client.whois(user, whois => {
+        return new Promise((resolve, _reject) => {
+            this._whoisUser(user).then(_userObject => {
                 this.authorizedUsers = this.authorizedUsers.filter(u => u.nick !== user);
                 fs.writeFileSync(pathToAuthorizedUsers, JSON.stringify(this.authorizedUsers, null, 2));
                 resolve();

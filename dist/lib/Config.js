@@ -25,11 +25,9 @@ class Config {
         if (!checkUser || !checkUser.hasOwnProperty('nick') || !checkUser.hasOwnProperty('user') || !checkUser.hasOwnProperty('host')) {
             return false;
         }
-        return this.ignoredUsers.filter((u) => {
-            return u.nick.toUpperCase() === checkUser.nick.toUpperCase()
-                || u.user.toUpperCase() === checkUser.user.toUpperCase()
-                || u.host.toUpperCase() === checkUser.host.toUpperCase();
-        }).length > 0;
+        return (this.ignoredUsers.filter((u) => {
+            return u.nick.toUpperCase() === checkUser.nick.toUpperCase() || u.user.toUpperCase() === checkUser.user.toUpperCase() || u.host.toUpperCase() === checkUser.host.toUpperCase();
+        }).length > 0);
     }
     reloadIgnoredUsers() {
         this.ignoredUsers = JSON.parse(fs_1.default.readFileSync(this.pathToIgnoredUsers, 'utf8'));

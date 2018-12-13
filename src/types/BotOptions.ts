@@ -8,7 +8,7 @@ export interface BotOptions {
     localAddress: any
     debug: boolean
     showErrors: boolean
-    channels: []
+    channels: string[]
     autoConnect: boolean
     autoRejoin: boolean
     autoRenick: boolean
