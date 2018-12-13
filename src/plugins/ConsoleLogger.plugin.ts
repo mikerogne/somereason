@@ -1,3 +1,7 @@
+import {IrcClient} from "../types/IrcClient";
+import Config = require("../lib/Config");
+import {EnvJson} from "../types/EnvJson";
+
 const messages = require('../lib/messages');
 
 /**
@@ -7,9 +11,7 @@ const messages = require('../lib/messages');
  * (Also serves as a good example of basic plugin structure!)
  */
 class ConsoleLoggerPlugin {
-    constructor() {
-        this.client = null;
-    }
+    client: IrcClient | null = null
 
     /**
      * This is automatically called by the Bot plugin loader.
@@ -17,18 +19,13 @@ class ConsoleLoggerPlugin {
      *
      * Receives client, can add own event listeners, etc.
      * Must return true, indicating successful plugin loading.
-     *
-     * @param client
-     * @param configService
-     * @param env
-     * @returns {boolean}
      */
-    load(client, configService, env) {
+    load(client: IrcClient, _configService: Config, _env: EnvJson): boolean {
         this.client = client;
 
-        this.client.addListener('registered', message => {
+        this.client.addListener('registered', _message => {
             const d = new Date;
-            console.log(`[${d.toLocaleString()}] Connected to ${server}`);
+            console.log(`[${d.toLocaleString()}] Connected to ${_configService.getConfig().server}`);
         });
 
         this.client.addListener('message', (from, to, text, message) => this.logIncomingMessage(from, to, text, message));
@@ -38,7 +35,7 @@ class ConsoleLoggerPlugin {
         return true;
     }
 
-    logIncomingMessage(from, to, text, message = text) {
+    logIncomingMessage(_from: string, _to: string, text: string, message:string = text) {
         // console.log({ from, to, text, message });
         console.log(messages.getFormattedLogOutput(message, this.client.nick));
     }

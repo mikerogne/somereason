@@ -8,7 +8,7 @@ class Docs {
     algoliaClient: algoliasearch.Client | null = null;
     env: any = null;
 
-    load(client: IrcClient, configService: Config, env: EnvJson) {
+    load(client: IrcClient, configService: Config, env: EnvJson): boolean {
         this.client = client;
         this.env = env;
 
