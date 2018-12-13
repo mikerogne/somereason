@@ -40,10 +40,9 @@ class Docs {
                 this.algoliaClient = algoliasearch_1.default(this.env.ALGOLIA_APP_ID, this.env.ALGOLIA_API_KEY);
             }
             const branch = this.env.ALGOLIA_DOCS_BRANCH || 'master';
-            const queries = [
-                { indexName: 'docs', query, params: { tagFilters: branch } }
-            ];
-            this.algoliaClient.search(queries)
+            const queries = [{ indexName: 'docs', query, params: { tagFilters: branch } }];
+            this.algoliaClient
+                .search(queries)
                 .then(response => {
                 const result = response.results[0];
                 if (result.hits.length > 0) {

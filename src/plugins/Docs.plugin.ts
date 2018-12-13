@@ -1,7 +1,7 @@
-import {IrcClient} from "../types/IrcClient";
-import algoliasearch from "algoliasearch";
-import Config = require("../lib/Config");
-import {EnvJson} from "../types/EnvJson";
+import { IrcClient } from '../types/IrcClient';
+import algoliasearch from 'algoliasearch';
+import Config = require('../lib/Config');
+import { EnvJson } from '../types/EnvJson';
 
 class Docs {
     client: IrcClient | null = null;
@@ -17,7 +17,9 @@ class Docs {
         }
 
         client.addListener('message', (from, channel, text, message) => {
-            if (configService.ignoringUser(message)) {return;}
+            if (configService.ignoringUser(message)) {
+                return;
+            }
 
             if (text.startsWith('.docs ') && text.length > 7) {
                 const query = text.replace('.docs ', '');
@@ -43,11 +45,10 @@ class Docs {
             }
 
             const branch = this.env.ALGOLIA_DOCS_BRANCH || 'master';
-            const queries = [
-                {indexName: 'docs', query, params: {tagFilters: branch}}
-            ];
+            const queries = [{ indexName: 'docs', query, params: { tagFilters: branch } }];
 
-            this.algoliaClient.search(queries)
+            this.algoliaClient
+                .search(queries)
                 .then(response => {
                     const result = response.results[0];
 
