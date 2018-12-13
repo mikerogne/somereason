@@ -1,9 +1,10 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class HeartPlugin {
     constructor() {
         this.client = null;
     }
-    load(client, configService, env) {
+    load(client, configService, _env) {
         this.client = client;
         client.addListener('message#', (from, channel, text, message) => {
             if (configService.ignoringUser(message)) {
@@ -38,4 +39,4 @@ class HeartPlugin {
         return true;
     }
 }
-module.exports = new HeartPlugin;
+module.exports = new HeartPlugin();

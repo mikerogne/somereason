@@ -1,16 +1,21 @@
-class HeartPlugin {
-    constructor() {
-        this.client = null;
-    }
+import Config = require('../lib/Config');
+import {IrcClient} from '../types/IrcClient';
+import {EnvJson} from '../types/EnvJson';
+import {Message} from '../types/Message';
 
-    load(client, configService, env) {
+class HeartPlugin {
+    client: IrcClient | null = null;
+
+    load(client: IrcClient, configService: Config, _env: EnvJson) {
         this.client = client;
 
-        client.addListener('message#', (from, channel, text, message) => {
-            if(configService.ignoringUser(message)) { return; }
+        client.addListener('message#', (from: string, channel: string, text: string, message: Message) => {
+            if (configService.ignoringUser(message)) {
+                return;
+            }
 
             const lovelyMessages = [
-                `${client.nick}: <3`,
+                `${client.nick}: <3`, //
                 `${client.nick}:<3`,
                 `${client.nick} <3`,
                 `${client.nick}, <3`,
@@ -23,10 +28,12 @@ class HeartPlugin {
         });
 
         client.addListener('message#', (from, channel, text, message) => {
-            if(configService.ignoringUser(message)) { return; }
+            if (configService.ignoringUser(message)) {
+                return;
+            }
 
             const lovelyMessages = [
-                `${client.nick}: </3`,
+                `${client.nick}: </3`, //
                 `${client.nick}:</3`,
                 `${client.nick} </3`,
                 `${client.nick}, </3`,
@@ -42,4 +49,4 @@ class HeartPlugin {
     }
 }
 
-module.exports = new HeartPlugin;
+module.exports = new HeartPlugin();
