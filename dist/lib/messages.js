@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class Messages {
     static getContextFromMesage(message) {
         if (message.args.length >= 2 && message.args[1].startsWith('\u0001')) {

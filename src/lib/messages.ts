@@ -1,5 +1,7 @@
+import {Message} from "../types/Message";
+
 class Messages {
-    static getContextFromMesage(message) {
+    static getContextFromMesage(message: Message) {
         if (message.args.length >= 2 && message.args[1].startsWith('\u0001')) {
             return message.args[1].slice(1).split(' ')[0];
         }
@@ -7,7 +9,7 @@ class Messages {
         return null;
     }
 
-    static getCleanedMessage(text) {
+    static getCleanedMessage(text: string) {
         if (text.startsWith('\u0001')) {
             let trimmedText = text.split(' ').slice(1).join(' ');
             trimmedText = trimmedText.endsWith('\u0001') ? trimmedText.slice(0, trimmedText.length - 1) : trimmedText;
@@ -18,7 +20,7 @@ class Messages {
         return text;
     }
 
-    static getFormattedLogOutput(message, botNick) {
+    static getFormattedLogOutput(message: Message, botNick: string) {
         const d = new Date;
         const from = message.nick;
         const text = this.getCleanedMessage(message.args[1]);
