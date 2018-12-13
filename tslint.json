@@ -7,6 +7,7 @@
   "rules": {
     "quotemark": [ "single" ],
     "no-unused-expression": [ true, "allow-fast-null-checks", "allow-new", "allow-tagged-template" ],
+    "no-unused-variable": true,
     "ordered-imports": false,
     "no-console": false,
     "member-access": false,

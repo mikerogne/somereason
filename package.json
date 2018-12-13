@@ -12,7 +12,6 @@
   "author": "Mike Rogne <mikerogne@users.noreply.github.com> (https://github.com/mikerogne)",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^10.12.12",
     "algoliasearch": "^3.30.0",
     "axios": "^0.18.0",
     "giphy-api": "^2.0.0",
@@ -20,6 +19,8 @@
     "youtube-search": "^1.1.3"
   },
   "devDependencies": {
+    "@types/algoliasearch": "^3.30.1",
+    "@types/node": "^10.12.12",
     "jest": "^23.6.0",
     "tslint": "^5.11.0",
     "typescript": "^3.2.2"

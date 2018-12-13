@@ -1,10 +1,13 @@
 "use strict";
-const algoliasearch = require('algoliasearch');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const algoliasearch_1 = __importDefault(require("algoliasearch"));
 class Docs {
     constructor() {
         this.client = null;
         this.algoliaClient = null;
-        this.algoliaIndex = null;
         this.env = null;
     }
     load(client, configService, env) {
@@ -24,7 +27,7 @@ class Docs {
                     .then(response => {
                     client.say(destination, response);
                 })
-                    .catch(err => {
+                    .catch(_err => {
                     client.say(destination, `No results found.`);
                 });
             }
@@ -34,12 +37,15 @@ class Docs {
     search(query) {
         return new Promise((resolve, reject) => {
             if (!this.algoliaClient) {
-                this.algoliaClient = algoliasearch(this.env.ALGOLIA_APP_ID, this.env.ALGOLIA_API_KEY);
-                this.algoliaIndex = this.algoliaClient.initIndex('docs');
+                this.algoliaClient = algoliasearch_1.default(this.env.ALGOLIA_APP_ID, this.env.ALGOLIA_API_KEY);
             }
             const branch = this.env.ALGOLIA_DOCS_BRANCH || 'master';
-            const search = this.algoliaIndex.search(query, { tagFilters: branch })
-                .then(result => {
+            const queries = [
+                { indexName: 'docs', query, params: { tagFilters: branch } }
+            ];
+            this.algoliaClient.search(queries)
+                .then(response => {
+                const result = response.results[0];
                 if (result.hits.length > 0) {
                     return resolve(`https://laravel.com/docs/${branch}/${result.hits[0].link}`);
                 }
