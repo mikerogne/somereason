@@ -13,10 +13,12 @@
     "member-access": false,
     "interface-name": false,
     "semicolon": [ true, "always", "ignore-interfaces" ],
-    "max-line-length": [ true, 150 ],
+    "max-line-length": [ false ],
     "arrow-parens": false,
     "new-parens": false,
-    "object-literal-shorthand": false
+    "object-literal-shorthand": false,
+    "variable-name": [ false ],
+    "object-literal-sort-keys": false
   },
   "rulesDirectory": [ ]
 }

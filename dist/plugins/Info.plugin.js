@@ -1,9 +1,10 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class InfoPlugin {
     constructor() {
         this.client = null;
     }
-    load(client, configService, env) {
+    load(client, configService, _env) {
         this.client = client;
         client.addListener('message', (from, to, text, message) => {
             if (configService.ignoringUser(message)) {
