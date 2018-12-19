@@ -1,11 +1,12 @@
-const axios = require('axios');
+import axios from "axios";
+import {IrcClient} from "../types/IrcClient";
+import Config = require("../lib/Config");
+import {EnvJson} from "../types/EnvJson";
 
 class Tenor {
-    constructor() {
-        this.client = null;
-    }
+    client: IrcClient | null = null;
 
-    load(client, configService, env) {
+    load(client: IrcClient, configService: Config, env: EnvJson) {
         this.client = client;
 
         if (!env.TENOR_API_KEY) {
@@ -13,7 +14,9 @@ class Tenor {
         }
 
         client.addListener('message', (from, channel, text, message) => {
-            if(configService.ignoringUser(message)) { return; }
+            if (configService.ignoringUser(message)) {
+                return;
+            }
 
             if (text.startsWith('.tenor ') && text.length > 7) {
                 const query = text.replace('.tenor ', '');
@@ -23,7 +26,7 @@ class Tenor {
                     .then(url => {
                         client.say(destination, url);
                     })
-                    .catch(err => {
+                    .catch((_err: Error) => {
                         client.say(destination, "No results found.");
                         return false;
                     });
@@ -33,8 +36,8 @@ class Tenor {
         return true;
     }
 
-    tenorSearch(query, apiKey, limit = 1) {
-        return new Promise((resolve, reject) => {
+    tenorSearch(query: string, apiKey: string, limit = 1) {
+        return new Promise<string>((resolve, reject) => {
             // https://tenor.com/gifapi/documentation#quickstart-setup
             // https://tenor.com/gifapi/documentation#responseobjects-gif
             const url = 'https://api.tenor.com/v1/search';
@@ -44,15 +47,15 @@ class Tenor {
                 limit,
             };
 
-            axios.get(url, { params })
-                 .then(({ data }) => {
-                     if (data.results.length === 0) {
-                         return reject(new Error('No results found'));
-                     }
+            axios.get(url, {params})
+                .then(({data}) => {
+                    if (data.results.length === 0) {
+                        return reject(new Error('No results found'));
+                    }
 
-                     resolve(data.results[0].url);
-                 })
-                 .catch(err => reject(err));
+                    resolve(data.results[0].url);
+                })
+                .catch(err => reject(err));
         });
     }
 }

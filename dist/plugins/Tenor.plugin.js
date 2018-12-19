@@ -1,5 +1,9 @@
 "use strict";
-const axios = require('axios');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const axios_1 = __importDefault(require("axios"));
 class Tenor {
     constructor() {
         this.client = null;
@@ -20,7 +24,7 @@ class Tenor {
                     .then(url => {
                     client.say(destination, url);
                 })
-                    .catch(err => {
+                    .catch((_err) => {
                     client.say(destination, "No results found.");
                     return false;
                 });
@@ -38,7 +42,7 @@ class Tenor {
                 q: query,
                 limit,
             };
-            axios.get(url, { params })
+            axios_1.default.get(url, { params })
                 .then(({ data }) => {
                 if (data.results.length === 0) {
                     return reject(new Error('No results found'));

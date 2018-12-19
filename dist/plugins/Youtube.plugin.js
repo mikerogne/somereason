@@ -1,8 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const youtube_search_1 = __importDefault(require("youtube-search"));
 class Youtube {
     constructor() {
         this.client = null;
-        this.search = require('youtube-search');
+        this.search = youtube_search_1.default;
     }
     load(client, configService, env) {
         this.client = client;
@@ -23,7 +28,7 @@ class Youtube {
                     const destination = channel === this.client.nick ? from : channel;
                     if (err || results.length === 0) {
                         client.say(destination, "No results found.");
-                        return false;
+                        return;
                     }
                     client.say(destination, `${results[0].link} - ${results[0].title}`);
                 });

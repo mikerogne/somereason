@@ -1,18 +1,24 @@
-class Youtube {
-    constructor() {
-        this.client = null;
-        this.search = require('youtube-search');
-    }
+import {IrcClient} from "../types/IrcClient";
+import youtubesearch, {YouTubeSearchResults} from "youtube-search";
+import Config = require("../lib/Config");
+import {EnvJson} from "../types/EnvJson";
+import {Message} from "../types/Message";
 
-    load(client, configService, env) {
+class Youtube {
+    client: IrcClient | null = null;
+    search: (term: string, opts: any, cb?: any) => any = youtubesearch;
+
+    load(client: IrcClient, configService: Config, env: EnvJson) {
         this.client = client;
 
         if (!env.YT_API_KEY) {
             return false;
         }
 
-        client.addListener('message', (from, channel, text, message) => {
-            if(configService.ignoringUser(message)) { return; }
+        client.addListener('message', (from: string, channel: string, text: string, message: Message) => {
+            if (configService.ignoringUser(message)) {
+                return;
+            }
 
             if (text.startsWith('.yt ') && text.length > 4) {
                 const query = text.replace('.yt ', '');
@@ -21,12 +27,12 @@ class Youtube {
                     key: env.YT_API_KEY,
                 };
 
-                this.search(query, options, (err, results) => {
+                this.search(query, options, (err: Error, results: YouTubeSearchResults[]) => {
                     const destination = channel === this.client.nick ? from : channel;
 
                     if (err || results.length === 0) {
                         client.say(destination, "No results found.");
-                        return false;
+                        return;
                     }
 
                     client.say(destination, `${results[0].link} - ${results[0].title}`);
