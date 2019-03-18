@@ -109,3 +109,35 @@ it('does not respond to ignored user', done => {
 
     done();
 });
+
+it('sees youtube link and says title', done => {
+    // ARRANGE
+    const pluginInstance = require('../../dist/plugins/Youtube.plugin.js');
+
+    // Mock for YT lookup. Don't want to hit API.
+    pluginInstance.search = jest.fn((query, options, callback) => {
+        callback(null, [
+            {
+                id: '6Mf2ylffKws',
+                link: 'https://www.youtube.com/watch?v=6Mf2ylffKws',
+                title: 'Ridiculous Actor Demands That Forced Movie Details To Change',
+            },
+        ]);
+    });
+
+    const client = new events.EventEmitter();
+    client.nick = 'somereason';
+    client.say = jest.fn(); // Mock. We'll examine the calls when making assertions.
+
+    // ACT
+    const pluginLoaded = pluginInstance.load(client, configService, env);
+    client.emit('message', 'otherperson', '#some-channel', 'https://www.youtube.com/watch?v=6Mf2ylffKws check this out');
+
+    // ASSERT
+    expect(pluginLoaded).toBe(true);
+    expect(client.say.mock.calls.length).toBe(1); // Bot should have responded.
+    expect(client.say.mock.calls[0][0]).toBe('#some-channel');
+    expect(client.say.mock.calls[0][1]).toBe('otherperson: Ridiculous Actor Demands That Forced Movie Details To Change');
+
+    done();
+});

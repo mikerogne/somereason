@@ -25,5 +25,8 @@
     "prettier": "^1.15.3",
     "tslint": "^5.11.0",
     "typescript": "^3.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
