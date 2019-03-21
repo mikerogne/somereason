@@ -25,58 +25,27 @@ class Youtube {
                 return;
             }
 
-            let usingDotYT = false;
-
             if (text.startsWith('.yt ') && text.length > 4) {
-                usingDotYT = true;
-                const query = text.replace('.yt ', '');
+                const youtubeUrls = [ 'youtube.com', 'youtu.be' ];
+                const query = text.replace(/\.yt |www\./g, '');
 
                 this.search(query, options, (err: Error, results: YouTubeSearchResults[]) => {
                     const destination = channel === this.client.nick ? from : channel;
+                    const searchIsUrl = -1 < youtubeUrls.findIndex((url: string) => {
+                        return url === query.toLowerCase().split('/')[2];
+                    });
+                    let msg;
 
                     if (err || results.length === 0) {
-                        client.say(destination, 'No results found.');
-                        return;
+                        msg = 'No results found.';
+                    } else if (searchIsUrl) {
+                        msg = `Title: ${results[0].title}`;
+                    } else {
+                        msg = `${results[0].link} - ${results[0].title}`;
                     }
 
-                    client.say(destination, `${results[0].link} - ${results[0].title}`);
+                    client.say(destination, msg);
                 });
-            }
-
-            if (usingDotYT) {
-                return;
-            }
-
-            const youtubeUrls = [
-                'https://www.youtube.com/', //
-                'http://www.youtube.com/',
-                'https://youtube.com/',
-                'https://youtube.com/',
-                'http://youtu.be/',
-                'https://youtu.be/',
-            ];
-
-            const urlMatches = text.match(/\bhttps?:\/\/\S+/gi);
-
-            if (urlMatches && urlMatches.length > 0) {
-                const firstUrl = urlMatches.find((url: string) => {
-                    return youtubeUrls.find(ytUrl => url.toLowerCase().startsWith(ytUrl));
-                });
-
-                // console.log({ firstUrl });
-
-                if (firstUrl) {
-                    this.search(firstUrl, options, (err: Error, results: YouTubeSearchResults[]) => {
-                        const destination = channel === this.client.nick ? from : channel;
-
-                        if (err || results.length === 0) {
-                            // client.say(destination, 'No results found.');
-                            return;
-                        }
-
-                        client.say(destination, `${from}: ${results[0].title}`);
-                    });
-                }
             }
         });
 
