@@ -110,7 +110,7 @@ it('does not respond to ignored user', done => {
     done();
 });
 
-it('sees youtube link and says title', done => {
+it('only includes title if search is a youtube link', done => {
     // ARRANGE
     const pluginInstance = require('../../dist/plugins/Youtube.plugin.js');
 
@@ -131,13 +131,13 @@ it('sees youtube link and says title', done => {
 
     // ACT
     const pluginLoaded = pluginInstance.load(client, configService, env);
-    client.emit('message', 'otherperson', '#some-channel', 'https://www.youtube.com/watch?v=6Mf2ylffKws check this out');
+    client.emit('message', 'otherperson', '#some-channel', '.yt https://www.youtube.com/watch?v=6Mf2ylffKws');
 
     // ASSERT
     expect(pluginLoaded).toBe(true);
     expect(client.say.mock.calls.length).toBe(1); // Bot should have responded.
     expect(client.say.mock.calls[0][0]).toBe('#some-channel');
-    expect(client.say.mock.calls[0][1]).toBe('otherperson: Ridiculous Actor Demands That Forced Movie Details To Change');
+    expect(client.say.mock.calls[0][1]).toBe('Title: Ridiculous Actor Demands That Forced Movie Details To Change');
 
     done();
 });
