@@ -26,30 +26,27 @@ class Youtube {
             }
 
             if (text.startsWith('.yt ') && text.length > 4) {
-                const youtubeUrls = [ 'youtube.com', 'youtu.be' ];
-                const query = text.replace(/\.yt |www\./g, '');
+                const query = text.replace(/^\.yt (.+)/, "$1");
 
                 this.search(query, options, (err: Error, results: YouTubeSearchResults[]) => {
                     const destination = channel === this.client.nick ? from : channel;
-                    const searchIsUrl = -1 < youtubeUrls.findIndex((url: string) => {
-                        return url === query.toLowerCase().split('/')[2];
-                    });
-                    let msg;
 
                     if (err || results.length === 0) {
-                        msg = 'No results found.';
-                    } else if (searchIsUrl) {
-                        msg = `Title: ${results[0].title}`;
+                        client.say(destination, 'No results found.');
+                    } else if (this.isYoutubeUrl(query)) {
+                        client.say(destination, `Title: ${results[0].title}`);
                     } else {
-                        msg = `${results[0].link} - ${results[0].title}`;
+                        client.say(destination, `${results[0].link} - ${results[0].title}`);
                     }
-
-                    client.say(destination, msg);
                 });
             }
         });
 
         return true;
+    }
+
+    isYoutubeUrl(query: string): boolean {
+        return query.match(/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//) !== null;
     }
 }
 
