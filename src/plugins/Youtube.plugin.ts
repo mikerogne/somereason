@@ -31,7 +31,9 @@ class Youtube {
 
                 this.search(query, options, (err: Error, results: YouTubeSearchResults[]) => {
                     const destination = channel === this.client.nick ? from : channel;
-                    const searchIsUrl = -1 < youtubeUrls.findIndex((url: string) => url === query.split('/')[2]);
+                    const searchIsUrl = -1 < youtubeUrls.findIndex((url: string) => {
+                        return url === query.toLowerCase().split('/')[2];
+                    });
                     let msg;
 
                     if (err || results.length === 0) {

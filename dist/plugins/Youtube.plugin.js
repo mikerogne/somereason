@@ -27,7 +27,9 @@ class Youtube {
                 const query = text.replace(/\.yt |www\./g, '');
                 this.search(query, options, (err, results) => {
                     const destination = channel === this.client.nick ? from : channel;
-                    const searchIsUrl = -1 < youtubeUrls.findIndex((url) => url === query.split('/')[2]);
+                    const searchIsUrl = -1 < youtubeUrls.findIndex((url) => {
+                        return url === query.toLowerCase().split('/')[2];
+                    });
                     let msg;
                     if (err || results.length === 0) {
                         msg = 'No results found.';
