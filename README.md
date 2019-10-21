@@ -19,10 +19,10 @@ Just another IRC bot. All the cool kids are doing it! 👈👈😎
 ### Getting Up & Running
 
 - `git clone git@github.com:mikerogne/somereason.git`
-- `npm install`
+- `npm ci`
 - `cp config/example-client.json config/client.json` (this is where you set the config options)
 - `cp config/example-env.json config/env.json` (this is where you set the env options)
-- `cp config/example-ignored_users.json config/ignord_users.json` (this is where you set the ignored users - but use .ignore/.unignore for that)
+- `cp config/example-ignored_users.json config/ignored_users.json` (this is where you set the ignored users - but use .ignore/.unignore for that)
 - `npm start` (Make sure to set the appropriate values in config/env.json - depending on which plugins you want to use!)
 
 ## Running the tests
