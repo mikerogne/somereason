@@ -12,8 +12,10 @@
   "author": "Mike Rogne <mikerogne@users.noreply.github.com> (https://github.com/mikerogne)",
   "license": "ISC",
   "dependencies": {
+    "@types/cheerio": "^0.22.13",
     "algoliasearch": "^3.30.0",
     "axios": "^0.18.1",
+    "cheerio": "^1.0.0-rc.3",
     "giphy-api": "^2.0.0",
     "irc-upd": "^0.10.0",
     "youtube-search": "^1.1.3"
